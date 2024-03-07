@@ -1,8 +1,12 @@
 ## Links
 
-[Chrome Web Store](https://chromewebstore.google.com/detail/j2n-window-manager/jjgebfkefchhekbmckeheacgbiicpmim).
+The extension can be downloaded from the [🔻Chrome Web Store🔻](https://chromewebstore.google.com/detail/j2n-window-manager/jjgebfkefchhekbmckeheacgbiicpmim)
 
-The extension **is and will always be free and open source** - if you like it you can [buy me a coffee](https://www.buymeacoffee.com/lukaszgruszka).
+If you want to support me, feel free to do it at [☕ Buy me a coffee ☕](https://www.buymeacoffee.com/lukaszgruszka)
+
+> I will be really thankful for anything: a coffee or just a kind comment
+>
+> *Remember to only donate if it is within your capacity, as refunds aren't possible and it's entirely optional, the extension **is and will always be free***.
 
 ## Extension
 
