@@ -191,7 +191,7 @@ async function showActions(actionsObj, matchersObj, matchersWithInvalidActionsMa
 
     cols[0].replaceChildren(document.createTextNode(actionId));
     cols[1].replaceChildren(document.createTextNode('invalid'));
-    cols[1].colSpan = 3;
+    cols[1].colSpan = 4;
     cols[2].replaceChildren(...(matchers.map((matcher) => createMatcherDiv(matcher))));
     cols[3].replaceChildren(document.createTextNode('invalid'));
     cols[3].colSpan = 2;
