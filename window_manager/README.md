@@ -1,3 +1,13 @@
+## Links
+
+**Installation: [🔻Chrome Web Store🔻](https://chromewebstore.google.com/detail/j2n-window-manager/jjgebfkefchhekbmckeheacgbiicpmim)**
+
+If you want to support me, feel free to do it at [☕ Buy me a coffee ☕](https://www.buymeacoffee.com/lukaszgruszka)
+
+> I will be really thankful for anything: a coffee or just a kind comment.  
+> *Remember to only donate if it is within your capacity, as refunds aren't possible and it's entirely optional,  
+> the extension **is and will always be free***.
+
 ## Extension
 
 The extension is automatically arranging chrome windows, according to the predefined rules stored as JSON configuration. This extension was created and tested on Chrome OS. It should work on other operating systems but will not be able to organize windows that don't belong to the chrome browser.
