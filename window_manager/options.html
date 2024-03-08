@@ -36,7 +36,7 @@
       }
 
       table, th, td {
-        border: 1px solid black;
+        border: 1px solid lightgray;
         padding: 5px;
         text-align: center;
       }
@@ -51,6 +51,7 @@
         border: 1px solid lightsteelblue;
         border-radius: 5px;
         display: inline-block;
+        font-style: italic;
         margin: 3px;
         padding: 3px;
         text-align: left;
@@ -66,10 +67,13 @@
       }
       .matchedMatcherChip {
         background-color: #efe;
+        font-style: normal;
+        font-weight: 500;
       }
       th {
         font-weight: bold;
-        background-color: lightsteelblue;
+        background-color: #3883fa;
+        color: white;
       }
       table {
         border-collapse: collapse;
@@ -144,7 +148,7 @@
             <span class="helpText" title="The 'actual resolution' is used in the 'column' and 'row' fields of actions to position the windows on the screen.">ⓘ</span>
           </th>
           <th>Desktop arrangement</th>
-          <th>Used in actions</th>
+          <th>Matched to display IDs</th>
         </thead>
         <tbody id="displaysTable">
         </tbody>
@@ -241,7 +245,8 @@
           <th>ID</th>
           <th>Display</th>
           <th>Matched display</th>
-          <th>Position</th>
+          <th>Row</th>
+          <th>Column</th>
           <th>Used in matchers</th>
           <th>Menu name</th>
           <th>Shortcut id</th>

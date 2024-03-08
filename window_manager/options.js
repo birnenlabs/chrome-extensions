@@ -116,6 +116,7 @@ async function showDisplays(configuredActions) {
   const actionsWithDisplay = filterWithDisplay(actions);
   const actionsWithoutDisplay = actions.filter((a) => (!(a instanceof ActionWithDisplay)));
 
+
   for (const display of displays) {
     const displayRow = document.createElement('tr');
     tableRows.push(displayRow);
@@ -129,8 +130,11 @@ async function showDisplays(configuredActions) {
     cols[3].replaceChildren(document.createTextNode(display.isInternal.toString()));
     cols[4].replaceChildren(document.createTextNode(display.resolution));
     cols[5].replaceChildren(document.createTextNode(`${display.bounds.width}x${display.bounds.height}`));
-    cols[6].replaceChildren(document.createTextNode(JSON.stringify(display.bounds, null, 2)));
-    cols[7].replaceChildren(...actionsWithDisplay.filter((a) => a.matchedDisplay.id === display.id).map((action) => createTableChip(action.id)));
+    cols[6].replaceChildren(document.createTextNode(`left: ${display.bounds.left}, top: ${display.bounds.top}`));
+
+    const col7 = document.createElement('pre');
+    col7.textContent = [...new Set(actionsWithDisplay.filter((a) => a.matchedDisplay.id === display.id).map((a) => a.display))].join('\n');
+    cols[7].replaceChildren(col7);
   }
 
   const missingDisplays = new Set(actionsWithoutDisplay.map((a) => a.display));
@@ -140,16 +144,17 @@ async function showDisplays(configuredActions) {
     displayRow.classList.add('warning');
     tableRows.push(displayRow);
 
-    const cols = new Array(3).fill(0).map(() => document.createElement('td'));
+    const cols = new Array(2).fill(0).map(() => document.createElement('td'));
     displayRow.replaceChildren(...cols);
 
-    cols[0].replaceChildren(document.createTextNode(missingDisplay));
-    cols[0].colSpan = 2;
-    cols[1].replaceChildren(document.createTextNode(
+    cols[0].replaceChildren(document.createTextNode(
         `Display '${missingDisplay}' is referred by some of the actions but it doesn't exist (this is normal if the display is not currently connected).`,
     ));
-    cols[1].colSpan = 5;
-    cols[2].replaceChildren(...actionsWithoutDisplay.filter((action) => action.display === missingDisplay).map((action) => createTableChip(action.id)));
+    cols[0].colSpan = 7;
+
+    const col1 = document.createElement('pre');
+    col1.textContent = missingDisplay;
+    cols[1].replaceChildren(col1);
   }
 
   checkNonUndefined(document.getElementById('displaysTable')).replaceChildren(...tableRows);
@@ -196,7 +201,7 @@ async function showActions(actionsObj, matchersObj, matchersWithInvalidActionsMa
     const displayRow = document.createElement('tr');
     tableRows.push(displayRow);
 
-    const cols = new Array(7).fill(0).map(() => document.createElement('td'));
+    const cols = new Array(8).fill(0).map(() => document.createElement('td'));
     displayRow.replaceChildren(...cols);
 
     cols[0].replaceChildren(document.createTextNode(action.id));
@@ -207,20 +212,21 @@ async function showActions(actionsObj, matchersObj, matchersWithInvalidActionsMa
     } else {
       cols[2].classList.add('warning');
     }
-    cols[3].replaceChildren(createPositionsElement(action));
+    cols[3].innerHTML = `<center>${action.row.start}<br>🡓<br>${action.row.end}</center>`;
+    cols[4].replaceChildren(document.createTextNode(`${action.column.start}⟶${action.column.end}`));
 
     const filteredMatchers = matchers.filter((m) => m.actions.some((a) => a === action.id))
         .map((m) => createMatcherDiv(m, m instanceof MatcherWithAction && m.matchedAction.id === action.id));
-    cols[4].replaceChildren(...filteredMatchers);
-    cols[5].replaceChildren(document.createTextNode(action.menuName || ''));
+    cols[5].replaceChildren(...filteredMatchers);
+    cols[6].replaceChildren(document.createTextNode(action.menuName || ''));
 
     const mappedShortcut = shortcutsMap.get(action.shortcutId);
-    cols[6].replaceChildren(document.createTextNode(
+    cols[7].replaceChildren(document.createTextNode(
       action.shortcutId ? `${mappedShortcut || 'not set'} [${action.shortcutId}]` : ''));
     if (action.shortcutId && !mappedShortcut) {
-      cols[6].classList.add('warning');
+      cols[7].classList.add('warning');
     } else {
-      cols[6].removeAttribute('class');
+      cols[7].removeAttribute('class');
     }
   }
 
@@ -249,28 +255,6 @@ function createTableChip(val) {
   el.textContent = val;
   el.classList.add('tableChip');
   return el;
-}
-
-/**
- * @param {Action} action
- * @return {HTMLElement}
- */
-function createPositionsElement(action) {
-  const table = document.createElement('table');
-  const tr1 = document.createElement('tr');
-  const tr2 = document.createElement('tr');
-
-  const td12 = document.createElement('td');
-  td12.textContent = `${action.column.start} 🡒 ${action.column.end}`;
-
-  const td21 = document.createElement('td');
-  td21.innerHTML = `${action.row.start}<br>🡓<br>${action.row.end}`;
-
-  tr1.replaceChildren(document.createElement('td'), td12);
-  tr2.replaceChildren(td21, document.createElement('td'));
-  table.replaceChildren(tr1, tr2);
-  table.classList.add('positionsTable');
-  return table;
 }
 
 /**
@@ -397,7 +381,7 @@ function getJsonTextFromEditor(editor) {
  * @return {Promise<void>}
  */
 function onPageLoad() {
-  actionsEditor= createJSONEditorForElement('actionsInput', [], schemaValidator.actions);
+  actionsEditor = createJSONEditorForElement('actionsInput', [], schemaValidator.actions);
   matchersEditor = createJSONEditorForElement('matchersInput', [], schemaValidator.matchers);
   settingsEditor = createJSONEditorForElement('settingsInput', {}, schemaValidator.settings);
 
