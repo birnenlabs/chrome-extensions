@@ -24,6 +24,8 @@
 
       pre {
         font-size: 9pt;
+        padding: 3px;
+        margin: 0;
       }
 
       .jsonEditor {
@@ -48,7 +50,7 @@
       }
       .tableChip {
         background-color: #eee;
-        border: 1px solid lightsteelblue;
+        border: 1px solid lightgray;
         border-radius: 5px;
         display: inline-block;
         font-style: italic;
@@ -115,7 +117,8 @@
         min-width: 350px;
       }
       .example {
-        background-color: lightgray;
+        background-color: #ebebeb;
+        border: 1px solid lightgray;
       }
 
       /* disable Json Editor's compact and transform modes */
@@ -170,23 +173,7 @@
         </div>
         <div class="editorRightCol">
           <p>Example Action:</p>
-          <pre class="example">
-  {
-    "comment": "An example Action definition",
-    "id": "action-id",
-    "display": "display-name",
-    "column": {
-      "start": 0,
-      "end": "100%"
-    },
-    "row": {
-      "start": 0,
-      "end": "100%"
-    },
-    "shortcutId": 0,
-    "menuName": ""
-  }
-          </pre>
+          <pre class="example" id="actionExample"></pre>
         </div>
       </div>
       <div id="actionsInputStatus"></div>
@@ -202,20 +189,7 @@
         </div>
         <div class="editorRightCol">
           <p>Example Matcher:</p>
-          <pre class="example">
-  {
-    "comment": "An example Matcher definition",
-    "actions": [
-      "action-id"
-    ],
-    "windowTypes": [
-      "normal"
-    ],
-    "anyTabUrl": "https://example.org/",
-    "minTabsNum": 0,
-    "maxTabsNum": 1000000
-  }
-          </pre>
+          <pre class="example" id="matcherExample"></pre>
         </div>
       </div>
       <div id="matchersInputStatus"></div>
