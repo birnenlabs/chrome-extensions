@@ -1,0 +1,55 @@
+body {
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+}
+
+.optionsTable {
+  border-collapse: collapse;
+  width: 100%;
+}
+
+.optionsTable, .optionsTable th, .optionsTable td {
+  border: 1px solid lightgray;
+  font-size: 12px;
+  padding: 5px;
+}
+
+.optionsTable th {
+  background-color: #3883fa;
+  color: white;
+  font-weight: bold;
+}
+
+#saveButton {
+  background-color: #fa6060;
+  border: none;
+  border-radius: 8px;
+  color: white;
+  cursor: pointer;
+  font-size: 16px;
+  margin: 8px 0;
+  min-width: 120px;
+  outline: none;
+  padding: 10px 16px;
+}
+
+#saveButton:hover {
+  filter: brightness(90%);
+}
+
+.button-processing {
+  cursor: progress;
+  filter: brightness(150%) !important;
+}
+
+.warning {
+  background-color: #ffe;
+  color: #e50;
+}
+
+.error {
+  background-color: #fff8d8;
+  color: red;
+}
+      

@@ -1,0 +1,61 @@
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="./tab-common-styles.css">
+    <style>
+      .helpText {
+        cursor: default;
+        font-size: 14px;
+        line-height: 12px;
+      }
+
+      td {
+        text-align: center;
+      }
+      
+      td:first-child {
+        font-weight: bold;
+      }
+
+      td > div {
+        margin: auto;
+        width: fit-content;
+      }
+
+      pre {
+        margin: 0;
+        padding: 0;
+        text-align: left;
+      }
+    </style>
+  </head>
+  <body>
+    <table class="optionsTable">
+      <thead>
+        <th>Name</th>
+        <th>ID</th>
+        <th>primary</th>
+        <th>internal</th>
+        <th>
+          Reported resolution (native)
+          <span class="helpText"
+            title="The 'reported resolution' is used in the 'display' field of actions to identify the specific monitor.">
+            ⓘ
+          </span>
+        </th>
+        <th>
+          Actual resolution (scaled)
+          <span class="helpText"
+            title="The 'actual resolution' is used in the 'column' and 'row' fields of actions to position the windows on the screen.">
+            ⓘ
+          </span>
+        </th>
+        <th>Desktop arrangement</th>
+        <th>References in the configuration</th>
+      </thead>
+      <tbody id="displaysTable">
+      </tbody>
+    </table>
+    <script src="./displays.js" type="module"></script>
+  </body>
+</html>

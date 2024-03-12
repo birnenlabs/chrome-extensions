@@ -1,5 +1,12 @@
 import {validateClass} from '../utils/validation.js';
 
+export const SETTINGS_HELP_MAP = new Map([
+  ['popupButtonColor', 'Color of the button in the window that opens after left click on the extension icon. It should be the html notation (examples: white, red, #ffffff).'],
+  ['popupBackgroundColor', 'Color of the window that opens after left click on the extension icon. It should be the html notation (examples: white, red, #ffffff).'],
+  ['rememberPositionsSetWithShortcut', 'Actions can specify "menuName" or "shortcutId", so the window position can be set using them. When this setting is true, the window position will be remembered in this session and upon the next automatic  window positioning (after monitor changes, shortcut or button click) the window will be restored according to last used menuName or shortcutId.'],
+  ['triggerOnMonitorChange', 'When this setting is true, all the windows will be automatically repositioned when monitor is attached or detached.'],
+  ['triggerOnWindowCreated', 'When this setting is true, newly created windows will be positioned according to the settings.'],
+]);
 
 /** Settings class */
 export class Settings {

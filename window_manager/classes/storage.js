@@ -208,7 +208,7 @@ export class Storage {
    */
   static async save(configuration) {
     if (configuration.valid !== true) {
-      throw new Error('Could not save invalid configuration');
+      throw new Error(`Could not save invalid configuration:\n${[configuration.actionsValidation, configuration.matchersValidation, configuration.settingsValidation].filter(Boolean).join('\n')}`);
     }
 
     // No need to update session storage - if anything is actually changed

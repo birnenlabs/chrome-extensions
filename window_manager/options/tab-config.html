@@ -1,0 +1,121 @@
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="./tab-common-styles.css">
+    <style>
+      .jsonEditor {
+        width: 100%;
+        height: 400px;
+      }
+      
+      .editorRow {
+        display: flex;
+        flex-direction: row;
+        flex-wrap: wrap;
+        justify-content: flex-start;
+        align-items: center;
+      }
+
+      .editorLeftCol {
+        flex-basis: 500px;
+        flex-grow: 1;
+        min-width: 500px;
+      }
+
+      .editorRightCol {
+        flex-basis: min-content;
+        flex-grow: 0;
+        padding-left: 10px;
+        min-width: 350px;
+      }
+
+      .editorStatus {
+        background-color: #ffde5c;
+        font-family: monospace;
+        font-size: 10pt;
+        min-height: 1.2em;
+        padding: 4px 10px;
+      }
+      
+      .editorStatus:empty {
+        background-color: unset;
+      }
+
+      #generalStatus {
+        border-radius: 8px;
+        display: inline-block;
+      }
+      
+      #saveButton {
+        margin-right: 10px;
+      }
+
+      .example {
+        background-color: #ebebeb;
+        border: 1px solid lightgray;
+      }
+
+      pre {
+        font-size: 9pt;
+        padding: 3px;
+        margin: 0;
+      }
+      
+      .jse-main table {
+        font-size: 10pt;
+      }
+      
+      /* disable Json Editor's compact and transform modes */
+      button.jse-compact {
+        display: none !important;
+      }
+      button.jse-transform {
+        display: none !important;
+      }
+      button.jse-sort {
+        display: none !important;
+    </style>
+  </head>
+  <body>
+    
+    <div>
+      <button id="saveButton">Save</button>
+      <span id="generalStatus" class="editorStatus"></span>
+    </div>
+    
+    <h2>Actions</h2>
+    <div class="editorRow">
+      <div class="editorLeftCol">
+        <h3 class="loading jsonEditor">Loading JSON editor...</h3>
+        <div id="actionsInput"
+            class="jsonEditor"
+            style="display: none;">
+        </div>
+        <div class="editorStatus" id="actionsStatus"></div>
+      </div>
+      <div class="editorRightCol">
+        <p>Example Action:</p>
+        <pre class="example" id="actionExample">loading...</pre>
+      </div>
+    </div>
+
+    <h2>Matchers</h2>
+    <div class="editorRow">
+      <div class="editorLeftCol">
+        <h3 class="loading jsonEditor">Loading JSON editor...</h3>
+        <div id="matchersInput"
+             class="jsonEditor"
+             style="display: none;">
+        </div>
+        <div class="editorStatus" id="matchersStatus"></div>
+      </div>
+      <div class="editorRightCol">
+        <p>Example Matcher:</p>
+        <pre class="example" id="matcherExample">loading...</pre>
+      </div>
+    </div>
+
+    <script src="./tab-config.js" type="module"></script>
+    <script src="./tab-config-examples.js" type="module"></script>
+  </body>
+</html>

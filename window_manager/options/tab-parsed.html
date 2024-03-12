@@ -1,0 +1,58 @@
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="./tab-common-styles.css">
+    <style>
+      td:first-child {
+        font-weight: bold;
+      }
+
+      .tableChip {
+        background-color: #eee;
+        border: 1px solid lightgray;
+        border-radius: 5px;
+        display: inline-block;
+        font-style: italic;
+        margin: 3px;
+        padding: 3px;
+        text-align: left;
+        width: fit-content;
+      }
+
+      .tableChip:first-child {
+        margin-top: 0;
+        margin-left: 0;
+      }
+
+      .tableChip:last-child {
+        margin-bottom: 0;
+        margin-right: 0;
+      }
+
+      .matchedMatcherChip {
+        background-color: #efe;
+        font-style: normal;
+        font-weight: 500;
+      }
+    </style>
+  </head>
+  <body>
+    
+    <table class="optionsTable">
+      <thead>
+        <th>ID</th>
+        <th>Display</th>
+        <th>Matched display</th>
+        <th>Row</th>
+        <th>Column</th>
+        <th>Used in matchers</th>
+        <th>Menu name</th>
+        <th>Shortcut id</th>
+      </thead>
+      <tbody id="actionsTable">
+      </tbody>
+    </table>
+
+    <script src="./tab-parsed.js" type="module"></script>
+  </body>
+</html>

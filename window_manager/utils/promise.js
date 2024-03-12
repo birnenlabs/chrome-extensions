@@ -1,5 +1,5 @@
 /**
- * Type checked function that combines 2 promises usind the function provided.
+ * Type checked function that combines 2 promises using the function provided.
  *
  * @template P1
  * @template P2
@@ -15,7 +15,7 @@ export function combine2(promise1, promise2, combineFn) {
 }
 
 /**
- * Type checked function that combines 3 promises usind the function provided.
+ * Type checked function that combines 3 promises using the function provided.
  *
  * @template P1
  * @template P2
@@ -30,6 +30,26 @@ export function combine2(promise1, promise2, combineFn) {
  */
 export function combine3(promise1, promise2, promise3, combineFn) {
   return Promise.all([promise1, promise2, promise3]).then((values) => combineFn(values[0], values[1], values[2]));
+}
+
+/**
+ * Type checked function that combines 4 promises using the function provided.
+ *
+ * @template P1
+ * @template P2
+ * @template P3
+ * @template P4
+ * @template R
+ *
+ * @param {Promise<P1>} promise1
+ * @param {Promise<P2>} promise2
+ * @param {Promise<P3>} promise3
+ * @param {Promise<P4>} promise4
+ * @param {function(P1, P2, P3, P4): R} combineFn
+ * @return {Promise<R>}
+ */
+export function combine4(promise1, promise2, promise3, promise4, combineFn) {
+  return Promise.all([promise1, promise2, promise3, promise4]).then((values) => combineFn(values[0], values[1], values[2], values[3]));
 }
 
 /**
