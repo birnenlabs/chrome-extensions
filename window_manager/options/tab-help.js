@@ -71,11 +71,6 @@ function parseMd(md) {
   // New lines
   result = result.replaceAll(/\n\n/g, '<p>\n');
   
-  // Blockquotes
-  result = result
-      .replaceAll(/(^|\n)> ([^\n]*)/g, '<blockquote>$2</blockquote>')
-      .replaceAll('</blockquote><blockquote>', '<br>');
-
   // Bold and italics
   result = result
     .replaceAll(/\*\*([^\*]*)\*\*/g, '<b>$1</b>')
