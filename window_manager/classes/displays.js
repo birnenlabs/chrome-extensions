@@ -1,3 +1,5 @@
+import {combine2, promiseLog} from '../utils/promise.js';
+
 /**
  * @typedef {Object} StrippedDisplay
  * @property {string} id
@@ -71,11 +73,12 @@ export class Displays {
   /**
    * @return {Promise<void>}
    */
-  static async init() {
+  static init() {
     console.group(`${new Date().toLocaleTimeString()} Displays: init`);
-    const currentDisplays = await Displays.#getSavedDisplays();
-    console.log(`${new Date().toLocaleTimeString()} Init:   ${JSON.stringify(currentDisplays)}`);
-    console.groupEnd();
+    return Displays.#getSavedDisplays()
+        .then((currentDisplays) =>
+          console.log(`${new Date().toLocaleTimeString()} Init:   ${JSON.stringify(currentDisplays)}`))
+        .finally(() => console.groupEnd());
   }
 
   /**
@@ -86,11 +89,16 @@ export class Displays {
    *
    * @return {Promise<boolean>}
    */
-  static async displaysChanged() {
-    const currentDisplaysPromise = Displays.getDisplays();
-    const savedDisplays = await Displays.#getSavedDisplays();
-    const currentDisplays = await currentDisplaysPromise;
+  static displaysChanged() {
+    return combine2(Displays.getDisplays(), Displays.#getSavedDisplays(), Displays.#displaysChanged);
+  }
 
+  /**
+   * @param {Display[]} currentDisplays
+   * @param {Display[]} savedDisplays
+   * @return {boolean|Promise<boolean>}
+   */
+  static #displaysChanged(currentDisplays, savedDisplays) {
     const savedDisplaysStripped = savedDisplays.map((display) => Displays.#mapImportantFields(display));
     const currentDisplaysStripped = currentDisplays.map((display) => Displays.#mapImportantFields(display));
 
@@ -192,14 +200,13 @@ export class Displays {
    * When storage is empty defaultValue displays will be saved and returned
    * When defaultValue is not provided current displays will be used.
    *
-   * @param {*} defaultValue
    * @return {Promise<Display[]>}
    */
-  static async #getSavedDisplays(defaultValue = undefined) {
-    const savedDisplays = await chrome.storage.session.get({displayData: ''})
-        .then((item) => item.displayData);
-    console.log(`${new Date().toLocaleTimeString()} Loaded: ${JSON.stringify(savedDisplays || '<null>')}`);
-    return savedDisplays || await Displays.#setSavedDisplays(defaultValue || await Displays.getDisplays());
+  static #getSavedDisplays() {
+    return chrome.storage.session.get({displayData: ''})
+        .then((item) => item.displayData)
+        .then((savedDisplays) => promiseLog(`${new Date().toLocaleTimeString()} Loaded: ${JSON.stringify(savedDisplays || '<null>')}`, savedDisplays))
+        .then((savedDisplays) => (savedDisplays || Displays.getDisplays().then(Displays.#setSavedDisplays)));
   }
 
   /**
@@ -208,10 +215,11 @@ export class Displays {
    * @param {Display[]} displays
    * @return {Promise<Display[]>}
    */
-  static async #setSavedDisplays(displays) {
-    await chrome.storage.session.set({displayData: displays});
-    console.log(`${new Date().toLocaleTimeString()} Saved:  ${JSON.stringify(displays)}`);
-    return displays;
+  static #setSavedDisplays(displays) {
+    return chrome.storage.session.set({displayData: displays})
+        .then(() => displays)
+        .finally(() =>
+          console.log(`${new Date().toLocaleTimeString()} Saved:  ${JSON.stringify(displays)}`));
   }
 
   /**

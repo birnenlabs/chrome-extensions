@@ -62,3 +62,15 @@ export function combine4(promise1, promise2, promise3, promise4, combineFn) {
 export function promiseTimeout(delay, result) {
   return new Promise((resolve) => setTimeout(resolve, delay)).then(() => result);
 }
+
+/**
+ * @template R
+ *
+ * @param {string} log
+ * @param {R} result
+ * @return {R}
+ */
+export function promiseLog(log, result) {
+  console.log(log);
+  return result;
+}

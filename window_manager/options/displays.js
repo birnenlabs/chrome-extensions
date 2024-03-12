@@ -1,5 +1,5 @@
-import {filterWithDisplay, matchActionsToDisplay, ActionWithDisplay} from '../classes/action.js';
-import {Displays} from '../classes/displays.js';
+import {filterWithDisplay, matchActionsToDisplay, Action, ActionWithDisplay} from '../classes/action.js';
+import {Display, Displays} from '../classes/displays.js';
 import {Storage} from '../classes/storage.js';
 import {checkNonUndefined} from '../utils/preconditions.js';
 import {combine2} from '../utils/promise.js';
@@ -19,21 +19,28 @@ function createPre(text) {
 /**
  * @return {Promise<void>}
  */
-async function showDisplays() {
+function showDisplays() {
   const storage = new Storage();
   // Always refresh config as this function might have been invoked after storage onChanged event.
   storage.refreshConfigFromSyncedStorage();
 
-  const tableRows = [];
-
   const displaysPromise = Displays.getDisplays();
-  const actions = await combine2(storage.getActions(), displaysPromise, matchActionsToDisplay);
+  const actionsPromise = combine2(storage.getActions(), displaysPromise, matchActionsToDisplay);
+
+  return combine2(actionsPromise, displaysPromise, reloadDisplayTable);
+}
+
+/**
+ * @param {Action[]} actions
+ * @param {Display[]} displays
+ */
+function reloadDisplayTable(actions, displays) {
+  const tableRows = [];
 
   const actionsWithDisplay = filterWithDisplay(actions);
   const actionsWithoutDisplay = actions.filter((a) => (!(a instanceof ActionWithDisplay)));
 
-
-  for (const display of await displaysPromise) {
+  for (const display of displays) {
     const displayRow = document.createElement('tr');
     tableRows.push(displayRow);
 

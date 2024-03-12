@@ -13,8 +13,9 @@ function parseMd(md) {
       // .replaceAll(/(^|\n)#{5} ([^\n]*)\n/g, '\n<h5>$2</h5>\n')
       // .replaceAll(/(^|\n)#{4} ([^\n]*)\n/g, '\n<h4>$2</h4>\n')
       .replaceAll(/(^|\n)#{3} ([^\n]*)\n/g, '\n<h3>$2</h3>\n')
-      .replaceAll(/(^|\n)#{2} ([^\n]*)\n/g, '\n<h2>$2</h2>\n');
-  // .replaceAll(/(^|\n)#{1} ([^\n]*)\n/g, '\n<h1>$2</h1>\n');
+      .replaceAll(/(^|\n)#{2} ([^\n]*)\n/g, '\n<h2>$2</h2>\n')
+      // .replaceAll(/(^|\n)#{1} ([^\n]*)\n/g, '\n<h1>$2</h1>\n')
+  ;
 
   // Lists
   result = result
