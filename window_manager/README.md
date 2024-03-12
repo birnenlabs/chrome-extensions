@@ -4,9 +4,9 @@
 
 If you want to support me, feel free to do it at [☕ Buy me a coffee ☕](https://www.buymeacoffee.com/lukaszgruszka)
 
-> I will be really thankful for anything: a coffee or just a kind comment.  
-> *Remember to only donate if it is within your capacity, as refunds aren't possible and it's entirely optional,  
-> the extension **is and will always be free***.
+> I will be really thankful for anything: a coffee or just a kind comment.
+> _Remember to only donate if it is within your capacity, as refunds aren't possible and it's entirely optional,
+> the extension **is and will always be free**_.
 
 ## Extension
 
@@ -16,50 +16,45 @@ This page describes options that are available on the options page (`chrome-exte
 
 ## Actions
 
-Action defines how the window should be moved and resized. Following fields are supported:
+Action defines how the window should be moved and resized.
 
-- `id` - **required**, identifier of the action, used in matchers to reference the action
+### `id`
 
-- `display` - **required**, name of display, the action will not be performed
-if there is no active display matching this name.
+**required**, identifier of the action, used in matchers to reference the action.
 
-  Available values:
-  - `primary` - display defined as primary.
-  - `-primary` - display that is not primary.
-  - `internal` - display defined as internal.
-  - `-internal` - display that is not internal.
-  - `[name of the display]` - name of the display, e.g. `DELL U4021QW`.
-  - `[id of the display]` - ChromeOS internal display ID, e.g. `73492720573986543`.
-  - `[resolution]` - Reported native resolution, e.g.: `3840x2160` (_hint - you can check resolution in the options page of the extension_).
+### `display`
 
-  If you have multiple displays that match the display name, you can specify the
-  index of the display to used as follows:
+**required**, name of display, the action will be ignored if there is no active display matching this name.
 
-  - `-internal[0]` - the first non-internal display
-  - `-internal[1]` - the second non-internal display
-  - `HP Z27n[1]` - the second "HP Z27n" display
-  - `3840x2160[1]` - the second 4k monitor
+Available values:
+- `primary` - display defined as primary.
+- `-primary` - display that is not primary.
+- `internal` - display defined as internal.
+- `-internal` - display that is not internal.
+- `[name of the display]` - name of the display, e.g. `DELL U4021QW`.
+- `[id of the display]` - ChromeOS internal display ID, e.g. `73492720573986543`.
+- `[resolution]` - Reported native resolution, e.g.: `3840x2160` (_hint - you can check resolution in the options page of the extension_).
 
-  Displays are ordered by their desktop arrangement:
-  from left to right, then from top to bottom. If no index is specified,
-  the first matched (ie leftmost) will be used.
+If you have multiple displays that match the display name, you can specify the index of the display to used as follows:
 
-  _Hint: A List of displays with their names, IDs and desktop position in this
-  sort order is shown at the top of the extension options page._
+- `-internal[0]` - the first non-internal display
+- `-internal[1]` - the second non-internal display
+- `HP Z27n[1]` - the second "HP Z27n" display
+- `3840x2160[1]` - the second 4k monitor
 
-- `shortcutId` - action will be triggered by the shortcut of given id as defined on the shortcuts page (`chrome://extensions/shortcuts`).
+Displays are ordered by their desktop arrangement: from left to right, then from top to bottom. If no index is specified, the first matched (i.e. leftmost) will be used.
 
-  _Hint: The same shortcutId can be used for multiple actions - after pressing shortcut all actions will be applied to matched window. This is also useful for different displays - the same shortcutId can trigger different action on different displays._
+_Hint: A List of displays with their names, IDs and desktop position in this sort order is shown at the top of the extension options page._
 
-  _This extension registered shortcuts with an ids starting from `1`. Please define the shortcut on the shortcuts page._
+### `shortcutId`
 
-- `column` - definition of column
+Action will be triggered by the shortcut of given id as defined on the shortcuts page (`chrome://extensions/shortcuts`).
 
-- `row `- definition of row
+_Hint: The same shortcutId can be used for multiple actions - after pressing shortcut the last matching action will be applied (please keep in mind that actions assigned to disconnected displays are ignored). This is useful for different displays - the same shortcutId can trigger different action on different displays._
 
-- `menuName` - if set, the action will be shown in the popup menu of extension
+_This extension registered shortcuts with an ids starting from `1`. Please define the shortcut on the shortcuts page._
 
-  _Hint: you can use unicode characters in the menu name._
+### `row` and `column`
 
 The `row` and `column` objects are defined using `start` and `end` fields. Following values of `start` and `end` are allowed:
 - `percentage value` defined as string (between `"0%"` and `"100%"`) - window will be set at percentage position of the screen
@@ -68,9 +63,16 @@ The `row` and `column` objects are defined using `start` and `end` fields. Follo
 
 The values are counted from the top left corner (top for the row definition and left for the column definition). On the hidpi displays they are the logical pixels that are defined after applying the scale.
 
+### `menuName`
+
+If set, the action will be shown in the popup menu of extension.
+
+_Hint: you can use unicode characters in the menu name._
+
+
 ### Example
 
-```json
+```
 [
   {
     "id":         "column1",
@@ -98,29 +100,39 @@ In addition to that the first action can be called by using keyboard shortcut nu
 
 ## Matchers
 
-Matchers define which action should be applied on a matched window. Following fields are supported:
+Matchers define which action should be applied on a matched window.
 
-- `actions` - **required**, array of strings - action ids to perform on the window if matched.
+### `actions`
 
-  _Please remember that an action definition contains a display. The action will not be performed if display doesn't exist._
+**required**, array of strings - action ids to perform on the window if matched.
 
-  Type of this field is array, so one matcher can be used with many actions, specified for different displays.
+_Please remember that an action definition contains a display. The action will not be performed if display doesn't exist._
 
-- `windowTypes` - array of window types to match as [defined here](https://developer.chrome.com/docs/extensions/reference/windows/#type-WindowType). Window will be matched if its type is in the array.
+Type of this field is array, so one matcher can be used with many actions, specified for different displays.
 
-  _**Default**: any window type_
+### `windowTypes`
 
-- `anyTabUrl` - url as string. The window will be matched if any of its tabs urls matches this string.
+An array of window types to match as [defined here](https://developer.chrome.com/docs/extensions/reference/windows/#type-WindowType). Window will be matched if its type is in the array.
 
-  _**Default**: any url_
+_**Default**: any window type_
 
-- `minTabsNum` - number of tabs. Window will be matched when it has at least `minTabsNum` tabs opened.
+### `anyTabUrl`
 
-  _**Default**: 0_
+An url as string. The window will be matched if any of its tabs urls matches this string.
 
-- `maxTabsNum` - number of tabs. Window will be matched when it has at most `maxTabsNum` tabs opened.
+_**Default**: any url_
 
-  _**Default**: 1'000'000'000_
+### `minTabsNum`
+
+Number of tabs. Window will be matched when it has at least `minTabsNum` tabs opened.
+
+_**Default**: 0_
+
+### `maxTabsNum`
+
+Number of tabs. Window will be matched when it has at most `maxTabsNum` tabs opened.
+
+_**Default**: 1'000'000'000_
 
 The default values are specified in a way that an empty matcher will match any window. This can be used as a default action (e.g. to maximise every window by default).
 
@@ -128,7 +140,7 @@ In case of multiple matches they are processed in a matchers order (_Note that o
 
 ### Example
 
-```json
+```
 [
   {
     "actions": ["column1"],
@@ -150,22 +162,39 @@ In the example above:
 
 Since the extension requires JSON knowledge to define the actions and matchers, it is simpler to specify settings as JSON instead of preparing an UI for each parameter. The following settings are possible:
 
-- `popupBackgroundColor` - string definition of color of the popup window background that is opened by the left click on the extension (e.g. `"white"`).
-- `popupButtonColor` - string definition of color of the popup window buttons (e.g. `"#f9f9f9"`).
-- `triggerOnMonitorChange` - boolean value - when true, the extension will rearrange all the windows when new monitors are connected or disconnected
-- `triggerOnWindowCreated` - boolean value - when true, the extension will apply matchers to newly created windows
+### `popupBackgroundColor`
+
+string definition of color of the popup window background that is opened by the left click on the extension (e.g. `"white"`).
+
+### `popupButtonColor`
+
+string definition of color of the popup window buttons (e.g. `"#f9f9f9"`).
+
+### `rememberPositionsSetWithShortcut`
+	
+Actions can specify `menuName` or `shortcutId`, so the window position can be set using them. When this setting is true, the window position will be remembered in this session and upon the next automatic window positioning (after monitor changes, shortcut or button click) the window will be restored according to last used `menuName` or `shortcutId`.
+
+### `triggerOnMonitorChange`
+
+boolean value - when true, the extension will rearrange all the windows when new monitors are connected or disconnected
+
+### `triggerOnWindowCreated`
+
+boolean value - when true, the extension will apply matchers to newly created windows
 
 
 ## FAQ
 
 ### How to use multiple displays with priority?
+
 Actions are performed in an order of matchers. Let's assume you want to process `github.com` window:
 - on the external display the window should occupy left half of the screen
 - on the internal display it should occupy the entire screen
 - when both screens are active (i.e. laptop screen is open and external display is connected) the external one should take precedence.
 
 Let's define two actions first:
-```json
+
+```
 [
   {
     "id": "internal-full-screen",
@@ -181,11 +210,12 @@ Let's define two actions first:
   }
 ]
 ```
+
 The `internal-full-screen` entry will be only applied on `internal` display (if it exists, otherwise will be ignored) and will set the window size to occupy 100% of the screen. The `non-internal-half` entry will be only applied on non internal screen (defined as `-internal`, note that it will be applied to the first non internal screen, if you want to use a specific non internal screen, please use the name of that screen instead).
 
 With the actions, let's define matchers for `github.com` window:
 
-```json
+```
 [
   {
     "actions": ["internal-full-screen", "non-internal-half"],
@@ -201,7 +231,7 @@ Matchers are processed in order of definition. If both internal and non internal
 <details>
   <summary>Actions</summary>
 
-```json
+```
 [
   {
     "comment": "Internal display has two overlapping columns - this is the one to the left.",
@@ -491,7 +521,7 @@ Matchers are processed in order of definition. If both internal and non internal
 <details>
   <summary>Matchers</summary>
 
-```json
+```
 [
   {
     "actions": [
@@ -621,7 +651,7 @@ Matchers are processed in order of definition. If both internal and non internal
 <details>
   <summary>Settings</summary>
 
-```json
+```
 {
   "popupButtonColor": "#f9f9f9",
   "popupBackgroundColor": "white",

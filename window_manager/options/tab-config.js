@@ -1,5 +1,6 @@
 import {Storage, StorageToJson} from '../classes/storage.js';
 import {checkNonUndefined} from '../utils/preconditions.js';
+import {promiseTimeout} from '../utils/promise.js';
 import * as StandaloneJsonEditor from '../jsoneditor/standalone.js';
 import * as schemaValidator from '../jsoneditor/schema-validator.js';
 
@@ -164,8 +165,8 @@ function validateActionIdsAreDefined(config) {
  * @return {ValidatedConfiguration}
  */
 function validateSetStatuses(config) {
-  setStatus(config.actionsValidation, 'actions');
-  setStatus(config.matchersValidation, 'matchers');
+  checkNonUndefined(document.getElementById('actionsStatus')).textContent = config.actionsValidation;
+  checkNonUndefined(document.getElementById('matchersStatus')).textContent = config.matchersValidation;
   return config;
 }
 
@@ -193,7 +194,7 @@ function onPageLoad() {
 
 /**
  * @param {KeyboardEvent} event
- * @return {void}
+ * @return {Promise<void> | void}
  */
 function onKeyDown(event) {
   if (event.key === 's' && !event.shiftKey && !event.altKey &&
@@ -201,26 +202,25 @@ function onKeyDown(event) {
           ( (event.ctrlKey && !event.metaKey) ||
             (!event.ctrlKey && event.metaKey))) {
     // Ctrl-S or CMD-S pressed
-    onSaveClick();
     event.preventDefault();
+    return onSaveClick();
   }
 }
 
 /** @return {Promise<void>} */
 function onSaveClick() {
+  const saveBtn = checkNonUndefined(document.getElementById('saveButton'));
+  const statusEl = checkNonUndefined(document.getElementById('generalStatus'));
+  saveBtn.style.display = 'none';
+
   return validate()
       .then((validatedConfig) => Storage.save(validatedConfig))
-      .then(() => setStatus('Options saved'))
+      .then(() => statusEl.textContent = 'Options saved')
       .then(() => undefined)
-      .catch((e) => setStatus(e.message));
-}
-
-/**
- * @param {string} status
- * @param {'actions'|'matchers'|'general'} surface
- */
-function setStatus(status, surface = 'general') {
-  checkNonUndefined(document.getElementById(surface + 'Status')).textContent = status;
+      .catch((e) => statusEl.textContent = e.message)
+      .finally(() => promiseTimeout(3000, undefined)
+          .then(() => saveBtn.style.display = '')
+          .then(() => statusEl.textContent = ''));
 }
 
 document.addEventListener('DOMContentLoaded', onPageLoad);

@@ -44,10 +44,17 @@
       #generalStatus {
         border-radius: 8px;
         display: inline-block;
+        margin: 8px 0;
+      }
+
+      /* Overwrite .editorStatus settings. */
+      #generalStatus:empty {
+        margin: 0;
+        padding: 0;
       }
       
-      #saveButton {
-        margin-right: 10px;
+      #saveStatusContainer {
+        min-height: 60px;
       }
 
       .example {
@@ -78,11 +85,11 @@
   </head>
   <body>
     
-    <div>
+    <div id="saveStatusContainer">
       <button id="saveButton">Save</button>
       <span id="generalStatus" class="editorStatus"></span>
     </div>
-    
+
     <h2>Actions</h2>
     <div class="editorRow">
       <div class="editorLeftCol">
@@ -94,6 +101,7 @@
         <div class="editorStatus" id="actionsStatus"></div>
       </div>
       <div class="editorRightCol">
+        <p>For documentation and more examples please open the 'Help' tab.</p>
         <p>Example Action:</p>
         <pre class="example" id="actionExample">loading...</pre>
       </div>
@@ -110,6 +118,7 @@
         <div class="editorStatus" id="matchersStatus"></div>
       </div>
       <div class="editorRightCol">
+        <p>For documentation and more examples please open the 'Help' tab.</p>
         <p>Example Matcher:</p>
         <pre class="example" id="matcherExample">loading...</pre>
       </div>

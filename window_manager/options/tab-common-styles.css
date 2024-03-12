@@ -21,6 +21,26 @@ body {
   font-weight: bold;
 }
 
+.documentationButton {
+  background-color: #579054;
+  border: none;
+  border-radius: 8px;
+  color: white;
+  cursor: pointer;
+  display: inline-block;
+  font-size: 16px;
+  font-weight: 500;
+  margin: 8px 0;
+  min-width: 120px;
+  outline: none;
+  padding: 10px 16px;
+  text-decoration: none;
+}
+
+.documentationButton:hover {
+  filter: brightness(90%);
+}
+
 #saveButton {
   background-color: #fa6060;
   border: none;
@@ -39,7 +59,7 @@ body {
 }
 
 .button-processing {
-  cursor: progress;
+  cursor: progress !important;
   filter: brightness(150%) !important;
 }
 
