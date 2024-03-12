@@ -82,7 +82,7 @@ function parseMd(md) {
     .replaceAll(/_([^_]*)_/g, '<i>$1</i>')
   
   // Links
-  result = result.replaceAll(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2">$1</a>');
+  result = result.replaceAll(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank">$1</a>');
   
   return result;
 }

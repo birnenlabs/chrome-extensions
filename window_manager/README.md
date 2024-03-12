@@ -33,7 +33,7 @@ Available values:
 - `-internal` - display that is not internal.
 - `[name of the display]` - name of the display, e.g. `DELL U4021QW`.
 - `[id of the display]` - ChromeOS internal display ID, e.g. `73492720573986543`.
-- `[resolution]` - Reported native resolution, e.g.: `3840x2160` (_hint - you can check resolution in the options page of the extension_).
+- `[resolution]` - Reported native resolution, e.g.: `3840x2160`.
 
 If you have multiple displays that match the display name, you can specify the index of the display to used as follows:
 
