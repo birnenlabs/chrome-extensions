@@ -24,7 +24,7 @@ function parseMd(md) {
 
   // source code
   result = result
-      .replaceAll(/(^|\n)```([^`]*)\n```\n/g, '<pre>$2</pre>')
+      .replaceAll(/(^|\n)```([^`]*)\n```\n/g, '<pre class="code">$2</pre>')
       .replaceAll(/`([^`]*)`/g, '<span class="code">$1</span>');
 
   // New lines

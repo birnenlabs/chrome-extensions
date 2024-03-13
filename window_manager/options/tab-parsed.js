@@ -11,12 +11,16 @@ let definedShortcutsArray = [];
 
 /**
  * @param {string} text
+ * @param {boolean} code
  * @return {HTMLElement}
  */
-function createPre(text) {
+function createPre(text, code = false) {
   const div = document.createElement('div');
   const pre = document.createElement('pre');
   pre.textContent = text;
+  if (code) {
+    pre.classList.add('code');
+  }
   div.appendChild(pre);
   return div;
 }
@@ -54,7 +58,7 @@ function showActions(actions, matchers, displays, shortcuts) {
     const cols = new Array(2).fill(0).map(() => document.createElement('td'));
     displayRow.replaceChildren(...cols);
 
-    cols[0].replaceChildren(createPre(invalidActionId));
+    cols[0].replaceChildren(createPre(invalidActionId, true));
     cols[1].replaceChildren(document.createTextNode('This action id is specified in some matchers but not defined in actions list. This is configuration error and will cause window manager to fail.'));
     cols[1].colSpan = 7;
   }
@@ -67,7 +71,7 @@ function showActions(actions, matchers, displays, shortcuts) {
     const cols = new Array(8).fill(0).map(() => document.createElement('td'));
     displayRow.replaceChildren(...cols);
 
-    cols[0].replaceChildren(createPre(action.id));
+    cols[0].replaceChildren(createPre(action.id, true));
     cols[1].replaceChildren(createPre(action.display));
     cols[2].replaceChildren(document.createTextNode(action instanceof ActionWithDisplay ? action.matchedDisplay.name : 'not connected'));
     if (action instanceof ActionWithDisplay) {

@@ -7,7 +7,7 @@
  *
  * @param {Promise<P1>} promise1
  * @param {Promise<P2>} promise2
- * @param {function(P1, P2): R} combineFn
+ * @param {function(P1, P2): R|Promise<R>} combineFn
  * @return {Promise<R>}
  */
 export function combine2(promise1, promise2, combineFn) {
@@ -25,7 +25,7 @@ export function combine2(promise1, promise2, combineFn) {
  * @param {Promise<P1>} promise1
  * @param {Promise<P2>} promise2
  * @param {Promise<P3>} promise3
- * @param {function(P1, P2, P3): R} combineFn
+ * @param {function(P1, P2, P3): R|Promise<R>} combineFn
  * @return {Promise<R>}
  */
 export function combine3(promise1, promise2, promise3, combineFn) {
@@ -45,7 +45,7 @@ export function combine3(promise1, promise2, promise3, combineFn) {
  * @param {Promise<P2>} promise2
  * @param {Promise<P3>} promise3
  * @param {Promise<P4>} promise4
- * @param {function(P1, P2, P3, P4): R} combineFn
+ * @param {function(P1, P2, P3, P4): R|Promise<R>} combineFn
  * @return {Promise<R>}
  */
 export function combine4(promise1, promise2, promise3, promise4, combineFn) {

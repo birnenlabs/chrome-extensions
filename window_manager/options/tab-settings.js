@@ -13,6 +13,7 @@ function createPre(text) {
   const div = document.createElement('div');
   const pre = document.createElement('pre');
   pre.textContent = text;
+  pre.classList.add('code');
   div.appendChild(pre);
   return div;
 }

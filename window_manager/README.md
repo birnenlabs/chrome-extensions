@@ -2,7 +2,7 @@
 
 **Installation: [🔻Chrome Web Store🔻](https://chromewebstore.google.com/detail/j2n-window-manager/jjgebfkefchhekbmckeheacgbiicpmim)**
 
-If you want to support me, feel free to do it at [☕ Buy me a coffee ☕](https://www.buymeacoffee.com/lukaszgruszka)
+If you want to support the extension, feel free to do it at [☕ Buy me a coffee ☕](https://www.buymeacoffee.com/lukaszgruszka)
 
 _This is entirely optional - the extension **is and will always be free**_.
 

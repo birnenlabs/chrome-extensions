@@ -96,7 +96,7 @@ export class Displays {
   /**
    * @param {Display[]} currentDisplays
    * @param {Display[]} savedDisplays
-   * @return {boolean|Promise<boolean>}
+   * @return {Promise<boolean>}
    */
   static #displaysChanged(currentDisplays, savedDisplays) {
     const savedDisplaysStripped = savedDisplays.map((display) => Displays.#mapImportantFields(display));
@@ -114,7 +114,7 @@ export class Displays {
 
     if (JSON.stringify(savedDisplaysSize) == JSON.stringify(currentDisplaysSize)) {
       console.log(`${new Date().toLocaleTimeString()} Displays.displaysChanged:false - important fields and work areas not changed`);
-      return false;
+      return Promise.resolve(false);
     }
 
     // At this point we know that ids, names and primary/internal assignments has not changed
@@ -133,7 +133,7 @@ export class Displays {
 
     if (currentDisplaysSize.some((display) => Displays.#areDisplaySizesEqual(display.bounds, display.workArea))) {
       console.log(`${new Date().toLocaleTimeString()} Displays.displaysChanged:false - at least one display has workArea == bounds`);
-      return false;
+      return Promise.resolve(false);
     } else {
       console.log(`${new Date().toLocaleTimeString()} Displays.displaysChanged:true - all displays has workArea != bounds`);
       return Displays.#setSavedDisplays(currentDisplays).then(() => true);

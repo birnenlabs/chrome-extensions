@@ -58,6 +58,17 @@ body {
   filter: brightness(90%);
 }
 
+
+.code {
+  background-color: #f3f3f3;
+  border: 1px solid lightgray;
+  border-radius: 3px;
+  color: green;
+  font-family: monospace;
+  padding: 1px 2px 0 2px;
+  width: fit-content;
+}
+      
 .button-processing {
   cursor: progress !important;
   filter: brightness(150%) !important;
