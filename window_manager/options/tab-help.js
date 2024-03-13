@@ -49,7 +49,7 @@ function onPageLoad() {
 
   return fetch(chrome.runtime.getURL('../README.md'))
       .then((resp) => resp.text())
-      .then(parseMd)
+      .then((md) => parseMd(md))
       .then(((resp) => helpContent.innerHTML = resp))
       .then(() => undefined);
 }

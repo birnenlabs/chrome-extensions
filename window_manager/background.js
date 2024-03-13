@@ -12,8 +12,6 @@ let displayChangedTimeoutId = null;
   await Displays.init();
 })();
 
-const storage = new Storage();
-
 chrome.commands.onCommand.addListener((command, tab) => {
   const commandIdPrefix = 'zzz-shortcut-';
 
@@ -33,7 +31,7 @@ chrome.commands.onCommand.addListener((command, tab) => {
 });
 
 chrome.system.display.onDisplayChanged.addListener(async () => {
-  const settings = await storage.getSettings();
+  const settings = await Storage.getSettings();
   if (settings.triggerOnMonitorChange) {
     if (displayChangedTimeoutId) {
       clearTimeout(displayChangedTimeoutId);
@@ -58,7 +56,7 @@ chrome.system.display.onDisplayChanged.addListener(async () => {
 });
 
 chrome.windows.onCreated.addListener((window) => {
-  return storage.getSettings()
+  return Storage.getSettings()
       .then((settings) => promiseTimeout(ACTION_START_TIMEOUT_MS, settings))
       .then((settings) =>
       settings.triggerOnWindowCreated ?
@@ -86,9 +84,3 @@ chrome.runtime.onMessage.addListener(
     },
 );
 
-
-// If synced storage changes, refresh local copy.
-chrome.storage.sync.onChanged.addListener((changes) => {
-  console.info(`${new Date().toLocaleTimeString()} synced config updated: changed keys: ${Object.keys(changes)}`);
-  storage.refreshConfigFromSyncedStorage();
-});

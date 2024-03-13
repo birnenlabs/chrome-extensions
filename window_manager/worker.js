@@ -8,8 +8,6 @@ import {combine2, combine3, promiseTimeout} from './utils/promise.js';
 
 const UPDATE_TIMEOUT_MS = 5;
 
-const storage = new Storage();
-
 /**
  * @typedef {import('./classes/action.js').WindowsUpdate} WindowsUpdate
  */
@@ -20,7 +18,7 @@ const storage = new Storage();
  * @return {Promise<ActionWithDisplay[]>}
  */
 function getValidActions(displaysPromise) {
-  const actionsPromise = storage.getActions();
+  const actionsPromise = Storage.getActions();
   return combine2(actionsPromise, displaysPromise, matchActionsToDisplay)
       .then(filterWithDisplay);
 }
@@ -32,7 +30,7 @@ function getValidActions(displaysPromise) {
  * @return {Promise<MatcherWithAction[]>}
  */
 function getValidMatchers(actionsPromise) {
-  const matchersPromise = storage.getMatchers();
+  const matchersPromise = Storage.getMatchers();
   return combine2(matchersPromise, actionsPromise, matchMatcherToAction)
       .then(filterWithAction);
 }
@@ -43,7 +41,7 @@ function getValidMatchers(actionsPromise) {
  * @return {Promise<boolean>}
  */
 function getRememberPositionsSetWithShortcut() {
-  return storage.getSettings().then((s) => s.rememberPositionsSetWithShortcut);
+  return Storage.getSettings().then((s) => s.rememberPositionsSetWithShortcut);
 }
 
 /**

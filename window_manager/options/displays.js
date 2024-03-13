@@ -4,6 +4,7 @@ import {Storage} from '../classes/storage.js';
 import {checkNonUndefined} from '../utils/preconditions.js';
 import {combine2} from '../utils/promise.js';
 
+
 /**
  * @param {string} text
  * @return {HTMLElement}
@@ -20,12 +21,8 @@ function createPre(text) {
  * @return {Promise<void>}
  */
 function showDisplays() {
-  const storage = new Storage();
-  // Always refresh config as this function might have been invoked after storage onChanged event.
-  storage.refreshConfigFromSyncedStorage();
-
   const displaysPromise = Displays.getDisplays();
-  const actionsPromise = combine2(storage.getActions(), displaysPromise, matchActionsToDisplay);
+  const actionsPromise = combine2(Storage.getActions(), displaysPromise, matchActionsToDisplay);
 
   return combine2(actionsPromise, displaysPromise, reloadDisplayTable);
 }
@@ -78,5 +75,5 @@ function reloadDisplayTable(actions, displays) {
 }
 
 document.addEventListener('DOMContentLoaded', showDisplays);
-chrome.system.display.onDisplayChanged.addListener(showDisplays);
-chrome.storage.sync.onChanged.addListener(showDisplays);
+chrome.system.display.onDisplayChanged.addListener(() => showDisplays);
+Storage.addOnChangeListener(() => showDisplays());

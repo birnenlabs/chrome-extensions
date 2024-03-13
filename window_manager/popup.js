@@ -42,8 +42,7 @@ function setCss(settings) {
 
 /** @return {Promise<void>} */
 function createActionsMenu() {
-  const storage = new Storage();
-  const actionsWithMenuPromise = storage.getActions()
+  const actionsWithMenuPromise = Storage.getActions()
       .then((actions) => actions.filter((a) => a.menuName));
 
   // Only create buttons for actions which have valid displays.
@@ -53,7 +52,7 @@ function createActionsMenu() {
 
   /** @type {Promise<void>} */
   const menuGeneratedPromise = combine2(actionMenuNamesPromise, chrome.windows.getCurrent().then((window) => window.id), addActions);
-  const cssPromise = storage.getSettings().then((s) => setCss(s));
+  const cssPromise = Storage.getSettings().then((s) => setCss(s));
 
   return combine2(menuGeneratedPromise, cssPromise, () => undefined);
 }

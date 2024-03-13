@@ -206,7 +206,7 @@ export class Displays {
     return chrome.storage.session.get({displayData: ''})
         .then((item) => item.displayData)
         .then((savedDisplays) => promiseLog(`${new Date().toLocaleTimeString()} Loaded: ${JSON.stringify(savedDisplays || '<null>')}`, savedDisplays))
-        .then((savedDisplays) => (savedDisplays || Displays.getDisplays().then(Displays.#setSavedDisplays)));
+        .then((savedDisplays) => (savedDisplays || Displays.getDisplays().then((d) => Displays.#setSavedDisplays(d))));
   }
 
   /**

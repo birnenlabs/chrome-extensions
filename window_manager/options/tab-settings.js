@@ -3,7 +3,6 @@ import {Storage} from '../classes/storage.js';
 import {checkNonUndefined} from '../utils/preconditions.js';
 
 const INPUT_CLASS = 'settingsValueInput';
-const storage = new Storage();
 
 /**
  * @param {string} text
@@ -70,26 +69,28 @@ function setSettings(settings) {
  * @return {Promise<void>}
  */
 function onPageLoad() {
-  storage.refreshConfigFromSyncedStorage();
-  return storage.getSettings().then(setSettings);
+  return Storage.getSettings().then((s) => setSettings(s));
 }
 
 /**
  * @return {Promise<void>}
  */
 function onSaveClick() {
+  const settings = getSettings();
+  settings.validate();
+
   const saveBtn = checkNonUndefined(document.getElementById('saveButton'));
   saveBtn.classList.add('button-processing');
   setTimeout(() => saveBtn.classList.remove('button-processing'), 500);
-  return Storage.loadConfigFromStorage()
+  return Storage.getConfiguration()
       .then((config) => {
-        config.settings = getSettings();
+        config.settings = settings;
         return config;
       })
-      .then(Storage.save);
+      .then((config) => Storage.save(config));
 }
 
 document.addEventListener('DOMContentLoaded', onPageLoad);
-chrome.storage.sync.onChanged.addListener(onPageLoad);
+Storage.addOnChangeListener(() => onPageLoad());
 
 checkNonUndefined(document.getElementById('saveButton')).addEventListener('click', onSaveClick);

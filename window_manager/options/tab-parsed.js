@@ -6,7 +6,6 @@ import {checkNonUndefined} from '../utils/preconditions.js';
 import {combine4} from '../utils/promise.js';
 
 const SHORTCUT_WATCH_TIMEOUT = 1000;
-const storage = new Storage();
 let definedShortcutsArray = [];
 
 /**
@@ -131,7 +130,7 @@ function shortcutWatcher() {
   setTimeout(shortcutWatcher, SHORTCUT_WATCH_TIMEOUT);
 
   return chrome.commands.getAll()
-      .then(maybeReloadActions);
+      .then((cmd) => maybeReloadActions(cmd));
 }
 
 /**
@@ -158,14 +157,12 @@ function maybeReloadActions(shortcuts) {
  * @return {Promise<void>}
  */
 function reloadActions() {
-  storage.refreshConfigFromSyncedStorage();
-
   const updateShortcutsArrayPromise = chrome.commands.getAll()
   // Assignment operator returns its value
       .then((shortcuts) => definedShortcutsArray = shortcuts);
 
-  return combine4(storage.getActions(), storage.getMatchers(), Displays.getDisplays(), updateShortcutsArrayPromise, showActions);
+  return combine4(Storage.getActions(), Storage.getMatchers(), Displays.getDisplays(), updateShortcutsArrayPromise, showActions);
 }
 
 document.addEventListener('DOMContentLoaded', onPageLoad);
-chrome.storage.sync.onChanged.addListener(reloadActions);
+Storage.addOnChangeListener(() => reloadActions());

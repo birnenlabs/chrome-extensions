@@ -1,3 +1,4 @@
+import {RawConfiguration, ValidatedConfiguration} from '../classes/configuration.js';
 import {Storage, StorageToJson} from '../classes/storage.js';
 import {checkNonUndefined} from '../utils/preconditions.js';
 import {promiseTimeout} from '../utils/promise.js';
@@ -5,7 +6,6 @@ import * as StandaloneJsonEditor from '../jsoneditor/standalone.js';
 import * as schemaValidator from '../jsoneditor/schema-validator.js';
 
 /**
- * @typedef {import('../classes/storage.js').ValidatedConfiguration} ValidatedConfiguration
  * @typedef {import('ajv').default} Ajv
  * @typedef {import('vanilla-jsoneditor/standalone.js').Validator} Validator
  */
@@ -14,8 +14,6 @@ import * as schemaValidator from '../jsoneditor/schema-validator.js';
 let actionsEditor;
 /** @type {StandaloneJsonEditor.JSONEditor} */
 let matchersEditor;
-
-const storage = new Storage();
 
 /**
  * Returns a JSONEditor schema validator wrapping a precomiled AJV Schema
@@ -110,18 +108,18 @@ function getJsonTextFromEditor(editor) {
  * @throws {SyntaxError} on invalid JSON
  */
 function validate() {
-  storage.refreshConfigFromSyncedStorage();
-
-  return storage.getSettings()
+  // Settings are not modified by this page. Let's refresh from the storage.
+  return Storage.getSettings()
       .then((settings) => ({
         actions: getJsonTextFromEditor(actionsEditor),
         matchers: getJsonTextFromEditor(matchersEditor),
         settings: StorageToJson.settings(settings),
       }))
-      .then(Storage.parse)
-      .then(validateCheckEditors)
-      .then(validateActionIdsAreDefined)
-      .then(validateSetStatuses);
+      .then((s) => RawConfiguration.fromString(s))
+      .then((r) => ValidatedConfiguration.fromRawConfiguration(r))
+      .then((conf) => validateCheckEditors(conf))
+      .then((conf) => validateActionIdsAreDefined(conf))
+      .then((conf) => validateSetStatuses(conf));
 }
 
 /**
