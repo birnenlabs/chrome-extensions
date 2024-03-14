@@ -75,5 +75,5 @@ function reloadDisplayTable(actions, displays) {
 }
 
 document.addEventListener('DOMContentLoaded', showDisplays);
-chrome.system.display.onDisplayChanged.addListener(() => showDisplays);
+chrome.system.display.onDisplayChanged.addListener(() => showDisplays());
 Storage.addOnChangeListener(() => showDisplays());
