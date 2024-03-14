@@ -11,6 +11,10 @@ export class Storage {
   /** @type {(function(): void)[]} */
   static #onChangeListeners = [];
 
+  // uuid is used in logs to debug storage objects. Service worker logs
+  // are also displayed in the console of options and popup windows.
+  static #uuid = crypto.randomUUID();
+
   /**
    * Note that worker, popup and options don't share the same VM, so this
    * code will be initialized multiple times.
@@ -21,9 +25,17 @@ export class Storage {
    * multiple times and not risk firing events to early.
    */
   static {
-    console.log(`${new Date().toLocaleTimeString()} Storage initialization - creating storage onChange listener`);
-    // If synced storage changes, refresh the session copy.
-    chrome.storage.sync.onChanged.addListener(() => Storage.#forceRefreshFromSyncedStorage().then(() => Storage.#sendOnChangedEvents()));
+    if (self.window) {
+      console.log(`${new Date().toLocaleTimeString()} Storage [${Storage.#uuid}]: initialization`);
+    } else {
+      console.log(`${new Date().toLocaleTimeString()} Storage [${Storage.#uuid}]: initialization from background worker - will sync storages`);
+      this.#forceRefreshFromSyncedStorage();
+      // Listen on SYNC storage changes to refresh session storage.
+      chrome.storage.sync.onChanged.addListener(() => Storage.#onSyncChanged());
+    }
+
+    // Listen on SESSION storage changes to inform subscribed clients.
+    chrome.storage.session.onChanged.addListener((changed) => changed.hasOwnProperty(VALID_CONFIG_KEY) ? Storage.#onSessionChanged() : undefined);
   }
 
   /**
@@ -31,7 +43,7 @@ export class Storage {
    * @return {Promise<Configuration>}
    */
   static #forceRefreshFromSyncedStorage() {
-    console.log(`${new Date().toLocaleTimeString()} Forcing configuration refresh from the synced storage.`);
+    console.log(`${new Date().toLocaleTimeString()} Storage [${Storage.#uuid}]: force refresh SYNC to SESSION`);
 
     return Storage.getRawConfiguration()
         .then((rawConfig) => ValidatedConfiguration.fromRawConfiguration(rawConfig))
@@ -39,10 +51,20 @@ export class Storage {
   }
 
   /**
-   * Will invoke all the registered callbacks.
+   * Will be invoke on sync storage change.
+   *
+   * @return {Promise<Configuration>}
    */
-  static #sendOnChangedEvents() {
-    console.log(`${new Date().toLocaleTimeString()} Storage will notify ${Storage.#onChangeListeners.length} listeners about configuration change`);
+  static #onSyncChanged() {
+    console.log(`${new Date().toLocaleTimeString()} Storage [${Storage.#uuid}]: SYNC changed, forcing refresh`);
+    return Storage.#forceRefreshFromSyncedStorage();
+  }
+
+  /**
+   * Will be invoke on session storage change.
+   */
+  static #onSessionChanged() {
+    console.log(`${new Date().toLocaleTimeString()} Storage [${Storage.#uuid}]: SESSION changed, notifying ${Storage.#onChangeListeners.length} listeners`);
     Storage.#onChangeListeners.forEach((fn) => fn());
   }
 
@@ -52,7 +74,14 @@ export class Storage {
   static #getSessionStorage() {
     return chrome.storage.session.get({[VALID_CONFIG_KEY]: null})
         .then((sessionConfig) => sessionConfig[VALID_CONFIG_KEY])
-        .then((configObj) => configObj ? Configuration.fromStorage(configObj) : undefined);
+        .then((configObj) => {
+          if (configObj) {
+            return Configuration.fromStorage(configObj);
+          } else {
+            console.log(`${new Date().toLocaleTimeString()} Storage [${Storage.#uuid}]: SESSION empty, forcing refresh`);
+            return Storage.#forceRefreshFromSyncedStorage();
+          }
+        });
   }
 
   /**
@@ -60,10 +89,11 @@ export class Storage {
    * @return {Promise<Configuration>}
    */
   static #setSessionStorage(config) {
-    console.log(`${new Date().toLocaleTimeString()} Updating configuration in the session storage.`);
+    console.log(`${new Date().toLocaleTimeString()} Storage [${Storage.#uuid}]: saving to SESSION`);
     if (config.valid) {
       return chrome.storage.session.set({[VALID_CONFIG_KEY]: config}).then(() => config);
     } else {
+      console.error(`${new Date().toLocaleTimeString()} Storage [${Storage.#uuid}]: invalid config`, config);
       return chrome.storage.session.remove(VALID_CONFIG_KEY)
           .then(() => Promise.reject(
               new Error(`${new Date().toLocaleTimeString()
