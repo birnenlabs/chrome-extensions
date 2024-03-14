@@ -7,11 +7,6 @@ const ACTION_START_TIMEOUT_MS = 200;
 
 let displayChangedTimeoutId = null;
 
-// Initialize session storage
-(async () => {
-  await Displays.init();
-})();
-
 chrome.commands.onCommand.addListener((command, tab) => {
   const commandIdPrefix = 'zzz-shortcut-';
 
@@ -30,29 +25,30 @@ chrome.commands.onCommand.addListener((command, tab) => {
   return promise.catch((e) => console.error(`onCommand failed with error: ${e.message}.`));
 });
 
-chrome.system.display.onDisplayChanged.addListener(async () => {
-  const settings = await Storage.getSettings();
-  if (settings.triggerOnMonitorChange) {
-    if (displayChangedTimeoutId) {
-      clearTimeout(displayChangedTimeoutId);
-      console.log(`${new Date().toLocaleTimeString()} onDisplayChanged: setting timer (previous timer cancelled)`);
-    } else {
-      console.log(`${new Date().toLocaleTimeString()} onDisplayChanged: setting timer`);
-    }
-    // wait a moment before doing anything - when display is created onDisplayChanged is triggered multiple times, this will consider the last change only.
-    displayChangedTimeoutId = setTimeout(
-        async () => {
-          displayChangedTimeoutId = null;
-          if (await Displays.displaysChanged()) {
-            console.log(`${new Date().toLocaleTimeString()} onDisplayChanged: display change detected, updating`);
-            await updateAllWindowsWithAllActions().catch((e) => console.error(`onDisplayChanged failed with error: ${e.message}.`));
+chrome.system.display.onDisplayChanged.addListener(() => {
+  return Storage.getSettings()
+      .then((settings) => {
+        if (settings.triggerOnMonitorChange) {
+          if (displayChangedTimeoutId) {
+            clearTimeout(displayChangedTimeoutId);
+            console.log(`${new Date().toLocaleTimeString()} onDisplayChanged: setting timer (previous timer cancelled)`);
           } else {
-            console.log(`${new Date().toLocaleTimeString()} onDisplayChanged: displays change not detected`);
+            console.log(`${new Date().toLocaleTimeString()} onDisplayChanged: setting timer`);
           }
-        },
-        ACTION_START_TIMEOUT_MS,
-    );
-  }
+
+          // wait a moment before doing anything - when display is created onDisplayChanged is triggered multiple times, this will consider the last change only.
+          displayChangedTimeoutId = setTimeout(
+              () => {
+                displayChangedTimeoutId = null;
+                return Displays.displaysChanged()
+                    .then((changed) => changed ? updateAllWindowsWithAllActions() : undefined)
+                    .catch((e) => console.error(`onDisplayChanged failed with error: ${e.message}.`));
+              },
+              ACTION_START_TIMEOUT_MS,
+          );
+        }
+        return undefined;
+      });
 });
 
 chrome.windows.onCreated.addListener((window) => {

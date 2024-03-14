@@ -52,7 +52,7 @@ const SCHEMA_DEFINITIONS = [
       id: {type: 'string', minLength: 1},
       display: {type: 'string', minLength: 1},
       menuName: {type: 'string', minLength: 1},
-      shortcutId: {type: 'integer', minimum: 1, maximum: 9},
+      shortcutId: {type: 'integer', minimum: 1, maximum: 12},
       column: {$ref: 'rowcol'},
       row: {$ref: 'rowcol'},
     },

@@ -1,5 +1,5 @@
 import {RawConfiguration, ValidatedConfiguration} from '../classes/configuration.js';
-import {Storage, StorageToJson} from '../classes/storage.js';
+import {Storage} from '../classes/storage.js';
 import {checkNonUndefined} from '../utils/preconditions.js';
 import {promiseTimeout} from '../utils/promise.js';
 import * as StandaloneJsonEditor from '../jsoneditor/standalone.js';
@@ -109,11 +109,11 @@ function getJsonTextFromEditor(editor) {
  */
 function validate() {
   // Settings are not modified by this page. Let's refresh from the storage.
-  return Storage.getSettings()
-      .then((settings) => ({
+  return Storage.getRawConfiguration()
+      .then((rawConfig) => ({
         actions: getJsonTextFromEditor(actionsEditor),
         matchers: getJsonTextFromEditor(matchersEditor),
-        settings: StorageToJson.settings(settings),
+        settings: rawConfig.settings,
       }))
       .then((s) => RawConfiguration.fromString(s))
       .then((r) => ValidatedConfiguration.fromRawConfiguration(r))
@@ -212,7 +212,7 @@ function onSaveClick() {
   saveBtn.style.display = 'none';
 
   return validate()
-      .then((validatedConfig) => Storage.save(validatedConfig))
+      .then((validatedConfig) => Storage.saveConfiguration(validatedConfig))
       .then(() => statusEl.textContent = 'Options saved')
       .then(() => undefined)
       .catch((e) => statusEl.textContent = e.message)

@@ -1,4 +1,5 @@
 import {combine2, promiseLog} from '../utils/promise.js';
+import {isServiceWorker} from '../utils/utils.js';
 
 /**
  * @typedef {Object} StrippedDisplay
@@ -70,15 +71,16 @@ export class Display {
 
 /** Displays class */
 export class Displays {
-  /**
-   * @return {Promise<void>}
-   */
-  static init() {
-    console.group(`${new Date().toLocaleTimeString()} Displays: init`);
-    return Displays.#getSavedDisplays()
-        .then((currentDisplays) =>
-          console.log(`${new Date().toLocaleTimeString()} Init:   ${JSON.stringify(currentDisplays)}`))
-        .finally(() => console.groupEnd());
+  // Unused variable, required for the static block promise to resolve.
+  static #unusedInit;
+
+  static {
+    // Initialise in service workers only.
+    if (isServiceWorker()) {
+      Displays.#unusedInit = Displays.#getSavedDisplays()
+          .then((currentDisplays) =>
+            console.log(`${new Date().toLocaleTimeString()} Displays Init:   ${JSON.stringify(currentDisplays)}`));
+    }
   }
 
   /**
@@ -197,15 +199,14 @@ export class Displays {
 
   /**
    * Returns saved displays from the storage.
-   * When storage is empty defaultValue displays will be saved and returned
-   * When defaultValue is not provided current displays will be used.
+   * When storage is empty current displays will be saved and returned.
    *
    * @return {Promise<Display[]>}
    */
   static #getSavedDisplays() {
     return chrome.storage.session.get({displayData: ''})
         .then((item) => item.displayData)
-        .then((savedDisplays) => promiseLog(`${new Date().toLocaleTimeString()} Loaded: ${JSON.stringify(savedDisplays || '<null>')}`, savedDisplays))
+        .then((savedDisplays) => promiseLog(`${new Date().toLocaleTimeString()} Displays Loaded: ${JSON.stringify(savedDisplays || '<null>')}`, savedDisplays))
         .then((savedDisplays) => (savedDisplays || Displays.getDisplays().then((d) => Displays.#setSavedDisplays(d))));
   }
 
@@ -219,7 +220,7 @@ export class Displays {
     return chrome.storage.session.set({displayData: displays})
         .then(() => displays)
         .finally(() =>
-          console.log(`${new Date().toLocaleTimeString()} Saved:  ${JSON.stringify(displays)}`));
+          console.log(`${new Date().toLocaleTimeString()} Displays Saved:  ${JSON.stringify(displays)}`));
   }
 
   /**

@@ -2,18 +2,27 @@ import {Action} from './action.js';
 import {Configuration, RawConfiguration, ValidatedConfiguration} from './configuration.js';
 import {Matcher} from './matcher.js';
 import {Settings} from './settings.js';
+import {checkNonUndefined} from '../utils/preconditions.js';
+import {isServiceWorker} from '../utils/utils.js';
 
 /** Session config key for the validated configuration */
 const VALID_CONFIG_KEY = 'validConfig';
 
 /** Storage class */
 export class Storage {
-  /** @type {(function(): void)[]} */
+  /** @type {(function(Configuration): void)[]} */
   static #onChangeListeners = [];
 
   // uuid is used in logs to debug storage objects. Service worker logs
   // are also displayed in the console of options and popup windows.
   static #uuid = crypto.randomUUID();
+
+  /**
+   * This is cached version of configuration that is stored in the session.
+   *
+   * @type {Promise<Configuration>}
+   */
+  static #cachedConfiguration;
 
   /**
    * Note that worker, popup and options don't share the same VM, so this
@@ -25,91 +34,34 @@ export class Storage {
    * multiple times and not risk firing events to early.
    */
   static {
-    if (self.window) {
-      console.log(`${new Date().toLocaleTimeString()} Storage [${Storage.#uuid}]: initialization`);
-    } else {
-      console.log(`${new Date().toLocaleTimeString()} Storage [${Storage.#uuid}]: initialization from background worker - will sync storages`);
-      this.#forceRefreshFromSyncedStorage();
-      // Listen on SYNC storage changes to refresh session storage.
-      chrome.storage.sync.onChanged.addListener(() => Storage.#onSyncChanged());
+    console.log(`${new Date().toLocaleTimeString()} Storage [${Storage.#uuid}]: init`);
+    chrome.storage.session.onChanged.addListener((changed) => changed.hasOwnProperty(VALID_CONFIG_KEY) ? Storage.#onSessionStorageChanged() : undefined);
+
+    if (isServiceWorker()) {
+      console.log(`${new Date().toLocaleTimeString()} Storage [${Storage.#uuid}]: starting SYNC to SESSION syncing job`);
+      chrome.storage.sync.onChanged.addListener(() => Storage.#onSyncStorageChanged());
     }
 
-    // Listen on SESSION storage changes to inform subscribed clients.
-    chrome.storage.session.onChanged.addListener((changed) => changed.hasOwnProperty(VALID_CONFIG_KEY) ? Storage.#onSessionChanged() : undefined);
+    // Init cached config from session. If it is undefined force storage sync.
+    Storage.#cachedConfiguration = Storage.#getSessionStorage()
+        .then((config) => config || Storage.#onSyncStorageChanged());
   }
 
   /**
-   * Read config from synced storage, and update session storage copy.
-   * @return {Promise<Configuration>}
-   */
-  static #forceRefreshFromSyncedStorage() {
-    console.log(`${new Date().toLocaleTimeString()} Storage [${Storage.#uuid}]: force refresh SYNC to SESSION`);
-
-    return Storage.getRawConfiguration()
-        .then((rawConfig) => ValidatedConfiguration.fromRawConfiguration(rawConfig))
-        .then((config) => Storage.#setSessionStorage(config));
-  }
-
-  /**
-   * Will be invoke on sync storage change.
+   * Adds a function that will be called when the configuration
+   * was updated and the client should act on it
    *
-   * @return {Promise<Configuration>}
+   * @param {function(Configuration): void} fn
    */
-  static #onSyncChanged() {
-    console.log(`${new Date().toLocaleTimeString()} Storage [${Storage.#uuid}]: SYNC changed, forcing refresh`);
-    return Storage.#forceRefreshFromSyncedStorage();
-  }
-
-  /**
-   * Will be invoke on session storage change.
-   */
-  static #onSessionChanged() {
-    console.log(`${new Date().toLocaleTimeString()} Storage [${Storage.#uuid}]: SESSION changed, notifying ${Storage.#onChangeListeners.length} listeners`);
-    Storage.#onChangeListeners.forEach((fn) => fn());
-  }
-
-  /**
-   * @return {Promise<Configuration | undefined>}
-   */
-  static #getSessionStorage() {
-    return chrome.storage.session.get({[VALID_CONFIG_KEY]: null})
-        .then((sessionConfig) => sessionConfig[VALID_CONFIG_KEY])
-        .then((configObj) => {
-          if (configObj) {
-            return Configuration.fromStorage(configObj);
-          } else {
-            console.log(`${new Date().toLocaleTimeString()} Storage [${Storage.#uuid}]: SESSION empty, forcing refresh`);
-            return Storage.#forceRefreshFromSyncedStorage();
-          }
-        });
-  }
-
-  /**
-   * @param {ValidatedConfiguration} config
-   * @return {Promise<Configuration>}
-   */
-  static #setSessionStorage(config) {
-    console.log(`${new Date().toLocaleTimeString()} Storage [${Storage.#uuid}]: saving to SESSION`);
-    if (config.valid) {
-      return chrome.storage.session.set({[VALID_CONFIG_KEY]: config}).then(() => config);
-    } else {
-      console.error(`${new Date().toLocaleTimeString()} Storage [${Storage.#uuid}]: invalid config`, config);
-      return chrome.storage.session.remove(VALID_CONFIG_KEY)
-          .then(() => Promise.reject(
-              new Error(`${new Date().toLocaleTimeString()
-              } Failed parsing config from synced storage errors: actions:${
-                config.actionsValidation
-              } matchers:${
-                config.matchersValidation
-              } settings:${
-                config.settingsValidation
-              }`)));
-    }
+  static addOnChangeListener(fn) {
+    Storage.#onChangeListeners.push(fn);
   }
 
   /**
    * Returns configuration as it was stored in the chrome.storage. It will try
    * to format it but it wont fail if the configuration is invalid.
+   *
+   * WARNING: This method is slow as it's always reading data from the SYNC storage.
    *
    * @return {Promise<RawConfiguration>}
    */
@@ -119,18 +71,10 @@ export class Storage {
   }
 
   /**
-   * @param {function(): void} fn
-   */
-  static addOnChangeListener(fn) {
-    Storage.#onChangeListeners.push(fn);
-  }
-
-  /**
    * @return {Promise<Configuration>}
    */
   static getConfiguration() {
-    return Storage.#getSessionStorage()
-        .then((config) => config || Storage.#forceRefreshFromSyncedStorage());
+    return Storage.#cachedConfiguration;
   }
 
   /** @return {Promise<Action[]>} */
@@ -149,57 +93,120 @@ export class Storage {
   }
 
   /**
-   * Saves validated configuration to the synced storage.
+   * Saves configuration.
    *
-   * @param {Configuration} input
-   * @return {Promise<void>}
+   * @param {Configuration} config
+   * @return {Promise<Configuration>}
    */
-  static save(input) {
-    const configuration = ValidatedConfiguration.fromConfiguration(input);
+  static saveConfiguration(config) {
+    console.log(`${new Date().toLocaleTimeString()} Storage [${Storage.#uuid}]: saving configuration`);
+
+    const configuration = ValidatedConfiguration.fromConfiguration(config);
 
     if (configuration.valid !== true) {
       throw new Error(`Could not save invalid configuration:\n${[configuration.actionsValidation, configuration.matchersValidation, configuration.settingsValidation].filter(Boolean).join('\n')}`);
     }
 
-    // No need to update session storage - if anything is actually changed
-    // the onChanged event handler in the service workers background.js
-    // will refresh the session storage, and the Storage instance
-    return chrome.storage.sync.set(
-        {
-          actions: StorageToJson.actions(configuration.actions, 0),
-          matchers: StorageToJson.matchers(configuration.matchers, 0),
-          settings: StorageToJson.settings(configuration.settings, 0),
+    return Storage.#setSyncStorage(configuration);
+  }
+
+  /**
+   * Read config from synced storage, and update session storage copy.
+   * @return {Promise<Configuration>}
+   */
+  static #forceRefreshFromSyncedStorage() {
+    console.log(`${new Date().toLocaleTimeString()} Storage [${Storage.#uuid}]: force refresh SYNC to SESSION`);
+
+    return Storage.getRawConfiguration()
+        .then((rawConfig) => ValidatedConfiguration.fromRawConfiguration(rawConfig))
+        .then((config) => Storage.#setSessionStorage(config));
+  }
+
+  /**
+   * Will be invoked on session storage change.
+   *
+   * @return {Promise<void>}
+   */
+  static #onSessionStorageChanged() {
+    console.log(`${new Date().toLocaleTimeString()} Storage [${Storage.#uuid}]: SESSION changed, updating cache and notifying ${Storage.#onChangeListeners.length} listeners`);
+
+    Storage.#cachedConfiguration = Storage.#getSessionStorage()
+    // Session storage config should not be undefined when invoked on session storage change event.
+        .then((conf) => checkNonUndefined(conf));
+
+    return Storage.#cachedConfiguration
+        .then((conf) => Storage.#onChangeListeners.forEach((fn) => fn(conf)))
+        .then(() => undefined);
+  }
+
+  /**
+   * Will be invoked on sync storage change.
+   *
+   * @return {Promise<Configuration>}
+   */
+  static #onSyncStorageChanged() {
+    console.log(`${new Date().toLocaleTimeString()} Storage [${Storage.#uuid}]: SYNC changed, forcing refresh`);
+
+    return Storage.#getSyncStorage().then((config) => Storage.#setSessionStorage(config));
+  }
+
+  /**
+   * @return {Promise<Configuration | undefined>}
+   */
+  static #getSessionStorage() {
+    return chrome.storage.session.get({[VALID_CONFIG_KEY]: null})
+        .then((sessionConfig) => sessionConfig[VALID_CONFIG_KEY])
+        .then((configObj) => {
+          if (configObj) {
+            return Configuration.fromStorage(configObj);
+          } else {
+            console.log(`${new Date().toLocaleTimeString()} Storage [${Storage.#uuid}]: SESSION empty`);
+            return undefined;
+          }
         });
   }
-}
 
-
-/** StorageToJson class */
-export class StorageToJson {
   /**
-   * @param {Action[]} actions
-   * @param {number} indent
-   * @return {string}
+   * @param {ValidatedConfiguration} config
+   * @return {Promise<Configuration>}
    */
-  static actions(actions, indent = 2) {
-    return JSON.stringify(actions, undefined, indent);
+  static #setSessionStorage(config) {
+    console.log(`${new Date().toLocaleTimeString()} Storage [${Storage.#uuid}]: saving to SESSION`);
+    // Not validating configuration - session version of config should be always in sync even if it is invalid.
+    return chrome.storage.session.set({[VALID_CONFIG_KEY]: config}).then(() => config);
   }
 
   /**
-   * @param {Matcher[]} matchers
-   * @param {number} indent
-   * @return {string}
+   * Returns configuration stored in sync.
+   * It returns ValidatedConfiguration as configuration read from
+   * string has to always be validated.
+   *
+   * @return {Promise<ValidatedConfiguration>}
    */
-  static matchers(matchers, indent = 2) {
-    return JSON.stringify(matchers, undefined, indent);
+  static #getSyncStorage() {
+    return Storage.getRawConfiguration()
+        .then((rawConfig) => ValidatedConfiguration.fromRawConfiguration(rawConfig));
   }
 
   /**
-   * @param {Settings} settings
+   * @param {Configuration} config
+   * @return {Promise<Configuration>}
+   */
+  static #setSyncStorage(config) {
+    return chrome.storage.sync.set(
+        {
+          actions: Storage.#toJson(config.actions, 0),
+          matchers: Storage.#toJson(config.matchers, 0),
+          settings: Storage.#toJson(config.settings, 0),
+        }).then(() => config);
+  }
+
+  /**
+   * @param {Action[]|Matcher[]|Settings} object
    * @param {number} indent
    * @return {string}
    */
-  static settings(settings, indent = 2) {
-    return JSON.stringify(settings, undefined, indent);
+  static #toJson(object, indent = 2) {
+    return JSON.stringify(object, undefined, indent);
   }
 }

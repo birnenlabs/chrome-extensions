@@ -19,9 +19,9 @@ export class RawConfiguration {
    */
   static fromString(obj) {
     const result = new RawConfiguration();
-    result.actions = RawConfiguration.#maybeFormat(obj.actions || '');
-    result.matchers = RawConfiguration.#maybeFormat(obj.matchers || '');
-    result.settings = RawConfiguration.#maybeFormat(obj.settings || '');
+    result.actions = RawConfiguration.#maybeFormat(obj.actions || '[]');
+    result.matchers = RawConfiguration.#maybeFormat(obj.matchers || '[]');
+    result.settings = RawConfiguration.#maybeFormat(obj.settings || '{}');
     return result;
   }
 

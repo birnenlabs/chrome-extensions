@@ -87,7 +87,8 @@ function onSaveClick() {
         config.settings = settings;
         return config;
       })
-      .then((config) => Storage.save(config));
+      .then((config) => Storage.saveConfiguration(config))
+      .then(() => undefined);
 }
 
 document.addEventListener('DOMContentLoaded', onPageLoad);
