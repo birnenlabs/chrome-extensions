@@ -13,6 +13,7 @@ const UPDATE_TIMEOUT_MS = 5;
  */
 
 /**
+ * Return list of actions that have active display.
  *
  * @param {Promise<Display[]>} displaysPromise
  * @return {Promise<ActionWithDisplay[]>}
@@ -70,6 +71,8 @@ export function updateWindowWithSpecifiedAction(windowId, actionPredicateFn) {
       .then(() => undefined);
 
   // Assign action to the current window id.
+  // We don't care about windowUpdatePromise here but it needs to be returned
+  // to be a part of a promise chain.
   return combine3(
       actionPromise, windowUpdatePromise, getRememberPositionsSetWithShortcut(),
       (action, windowUpdate, rememberPosition) => ({action, rememberPosition}))

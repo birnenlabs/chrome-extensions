@@ -42,8 +42,13 @@ function showActions(actions, matchers, displays, shortcuts) {
   );
 
   // Match actions to displays and matchers to actions.
-  const actionsWithDisplay = matchActionsToDisplay(actions, displays);
-  const matchersWithActions = matchMatcherToAction(matchers, filterWithDisplay(actionsWithDisplay));
+  // Add id so actions with the same name can be distinguished.
+  let id = 1;
+  const ID_PROP = '___internal_id___';
+  /** @type {(Action | ActionWithDisplay)[]} */
+  const actionsWithDisplayAndId = matchActionsToDisplay(actions, displays)
+    .map((action) => {action[ID_PROP] = id++; return action;});
+  const matchersWithActions = matchMatcherToAction(matchers, filterWithDisplay(actionsWithDisplayAndId));
 
   // print ids that are defined in matchers but not in actions.
   const validActionIds = new Set(actions.map((a) => a.id));
@@ -63,7 +68,7 @@ function showActions(actions, matchers, displays, shortcuts) {
   }
 
 
-  for (const action of actionsWithDisplay) {
+  for (const action of actionsWithDisplayAndId) {
     const displayRow = document.createElement('tr');
     tableRows.push(displayRow);
 
@@ -82,7 +87,7 @@ function showActions(actions, matchers, displays, shortcuts) {
     cols[4].replaceChildren(document.createTextNode(`${action.column.start}⟶${action.column.end}`));
 
     const filteredMatchers = matchersWithActions.filter((m) => m.actions.some((a) => a === action.id))
-        .map((m) => createMatcherDiv(m, m instanceof MatcherWithAction && m.matchedAction.id === action.id));
+        .map((m) => createMatcherDiv(m, m instanceof MatcherWithAction && m.matchedAction[ID_PROP] === action[ID_PROP]));
     cols[5].replaceChildren(...filteredMatchers);
     cols[6].replaceChildren(document.createTextNode(action.menuName || ''));
 

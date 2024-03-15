@@ -49,7 +49,7 @@ export class Session {
    */
   static #getWindowPositionConfigurations() {
     return chrome.storage.session.get({windowPositionConfigurations: '[]'})
-        .then((item) => JSON.parse(item.windowPositionConfigurations));
+        .then((item) => item.windowPositionConfigurations);
   }
 
   /**
@@ -57,6 +57,6 @@ export class Session {
    * @return {Promise<void>}
    */
   static #setWindowPositionConfigurations(windowPositionConfigurations) {
-    return chrome.storage.session.set({windowPositionConfigurations: JSON.stringify(windowPositionConfigurations)});
+    return chrome.storage.session.set({windowPositionConfigurations: windowPositionConfigurations});
   }
 }
