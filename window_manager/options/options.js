@@ -3,7 +3,7 @@ import {checkNonEmpty} from '../utils/preconditions.js';
 /**
  * Loads the config, and sets up editors.
  */
-function onPageLoad() {
+function onPageFullyLoad() {
   Array.from(document.getElementsByTagName('iframe')).forEach(setupIframeResizer);
   document.querySelectorAll('.tab-button').forEach((el) => el.addEventListener('click', onTabClick));
 }
@@ -47,4 +47,5 @@ function setupIframeResizer(iframeEl) {
   ro.observe(iframeBody);
 }
 
-document.addEventListener('DOMContentLoaded', onPageLoad);
+// Not using DOMContentLoaded as we want all the iframes to fully load.
+window.addEventListener('load', onPageFullyLoad);
