@@ -47,7 +47,9 @@ function showActions(actions, matchers, displays, shortcuts) {
   const ID_PROP = '___internal_id___';
   /** @type {(Action | ActionWithDisplay)[]} */
   const actionsWithDisplayAndId = matchActionsToDisplay(actions, displays)
-    .map((action) => {action[ID_PROP] = id++; return action;});
+      .map((action) => {
+        action[ID_PROP] = id++; return action;
+      });
   const matchersWithActions = matchMatcherToAction(matchers, filterWithDisplay(actionsWithDisplayAndId));
 
   // print ids that are defined in matchers but not in actions.
