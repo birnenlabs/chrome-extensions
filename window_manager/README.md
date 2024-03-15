@@ -20,6 +20,8 @@ Action defines how the window should be moved and resized.
 
 **required**, identifier of the action, used in matchers to reference the action.
 
+_Hint: It is **ok to use duplicated ids** (e.g. use the same id with different display definition)- the last one will always be used._
+
 ### `display`
 
 **required**, name of display, the action will be ignored if there is no active display matching this name.
