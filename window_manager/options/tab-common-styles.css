@@ -10,7 +10,7 @@ body {
 }
 
 .optionsTable, .optionsTable th, .optionsTable td {
-  border: 1px solid lightgray;
+  border-bottom: 1px solid lightgray;
   font-size: 12px;
   padding: 5px;
 }
