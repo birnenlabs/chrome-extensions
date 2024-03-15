@@ -1,4 +1,6 @@
 body {
+  /* Setting border here as the iframe rendering cause 1px differences between this and parent. */
+  border-top: 3px solid #3883fa;
   box-sizing: border-box;
   padding: 0;
   margin: 0;
