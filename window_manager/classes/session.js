@@ -51,7 +51,7 @@ export class Session {
     return chrome.storage.session.get({windowPositionConfigurations: []})
         .then((item) => item.windowPositionConfigurations);
   }
-  
+
   /**
    * @param {WindowPositionConfiguration[]} windowPositionConfigurations
    * @return {Promise<void>}
