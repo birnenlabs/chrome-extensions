@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <style>
+    body {
+      font-size: 14px;
+    }
+
+    h1 {
+      font-size: 18px;
+    }
+
+    .code {
+      background-color: #ccc;
+      border-radius: 5px;
+      font-family: monospace;
+      padding: 2px 2px 0 2px;
+    }
+
+    .error {
+      background-color: #fff8d8;
+      border-radius: 5px;
+      color: #f00;
+      margin-left: 5px;
+      padding: 2px 2px 0 2px;
+    }
+
+    #allowDiv > div, #blockDiv > div {
+      margin-bottom: 10px;
+    }
+
+    .remove-button {
+      cursor: pointer;
+      margin-left: 5px;
+    }
+
+    #saveButton {
+      margin-top: 15px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Allowed URLs</h1>
+  <div id="allowDiv"></div>
+  <div>
+    <input id="allowInput" placeholder="<scheme>://<host>/<path>" type="text">
+    <button id="allowButton">allow</button>
+  </div>
+
+  <h1>Blocked URLs</h1>
+  <p>Hint: use <span class='code'>&lt;all_urls&gt;</span> to block all the notifications from the urls that are not explicitely allowed.</p>
+  <div id="blockDiv"></div>
+  <div> 
+    <input id="blockInput" placeholder="<scheme>://<host>/<path>" type="text"> 
+    <button id="blockButton">block</button>
+  </div>
+
+  <button id="saveButton">save</button>
+
+  <script src="./options.js" type="module"></script>
+</body>
+</html>
