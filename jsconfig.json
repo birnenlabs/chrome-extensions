@@ -6,6 +6,10 @@
     "allowJs": true,
     "noEmit": true,
     "strictNullChecks": true,
+    "paths": {
+     "https://www.gstatic.com/firebasejs/10.11.1/firebase-app.js": ["./node_modules/@firebase/app"],
+     "https://www.gstatic.com/firebasejs/10.11.1/firebase-database.js": ["./node_modules/@firebase/database"]
+    }
   },
   "exclude": ["./window_manager/jsoneditor/*", "node_modules"]
 }

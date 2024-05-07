@@ -19,5 +19,8 @@
     "generate-files": "cp node_modules/vanilla-jsoneditor/standalone.* window_manager/jsoneditor/ && cd window_manager && node ./generate-schema-validator.mjs",
     "build-wm-files": "npm run generate-files",
     "build-extension": "$(dirname $npm_package_json)/build-extension.sh"
+  },
+  "dependencies": {
+    "firebase": "^10.11.1"
   }
 }

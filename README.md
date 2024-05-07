@@ -23,6 +23,11 @@ git remote set-url origin git+ssh://git@github.com/birnenlabs/chrome-extensions
 npm install 
 ```
 
+#### install firebase dependency
+```shell
+npm install firebase
+```
+
 #### Check for linting errors
 ```shell
 npm run eslint

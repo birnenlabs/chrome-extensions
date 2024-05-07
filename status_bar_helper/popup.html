@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Settings</title>
+
+    <style>
+      html {
+        width: 600px;
+      }
+      body {
+        font-family: Roboto;
+      }
+
+      input:not([type]), input[type="text"] {
+        width: 100%;
+      }
+    </style>
+
+    <script type='module' src="./popup.js"></script>
+  </head>
+  <body>
+
+    <h1>Settings</h1>
+
+    <section>
+      Settings are stored in a local browser storage and will never leave your computer.
+
+      <h2>Firebase</h2>
+      <section>
+        <h3>Realtime Database URL</h3>
+        <input id="firebase-url">
+
+        <h3><input id="firebaseSave" type="button" value="Save"></h3>
+      </section>
+
+    </section>
+
+  </body>
+</html>
