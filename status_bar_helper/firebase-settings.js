@@ -9,12 +9,20 @@ export class FirebaseSettings {
   }
 
   /**
+   * @return {Promise<string>}
+   */
+  static getToken() {
+    return chrome.storage.local.get(name).then((data) => data[name]?.token || '');
+  }
+
+  /**
    * Save to storage.
    * @param {string} url
+   * @param {string} token
    * @return {Promise<any>}
    */
-  static save(url) {
-    console.log(`FirebaseSettings saving: ${url}`);
-    return chrome.storage.local.set({[name]: {url}});
+  static save(url, token) {
+    console.log(`FirebaseSettings saving: ${url}, ${token}`);
+    return chrome.storage.local.set({[name]: {url, token}});
   }
 }

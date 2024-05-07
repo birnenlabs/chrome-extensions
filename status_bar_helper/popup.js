@@ -16,14 +16,17 @@ function getInput(id) {
  * @return {Promise<any>}
  */
 function firebaseInit() {
-  return FirebaseSettings.getUrl().then((url) => getInput('firebase-url').value = (url || ''));
+  return FirebaseSettings.getUrl()
+      .then((url) => getInput('firebase-url').value = (url || ''))
+      .then(() => FirebaseSettings.getToken())
+      .then((token) => getInput('firebase-token').value = (token || ''));
 }
 
 /**
  * @return {Promise<any>}
  */
 function firebaseSave() {
-  return FirebaseSettings.save(getInput('firebase-url').value);
+  return FirebaseSettings.save(getInput('firebase-url').value, getInput('firebase-token').value);
 }
 
 

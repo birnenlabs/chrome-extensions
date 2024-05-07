@@ -19,13 +19,14 @@ const KEY_SONG_TITLE = 'song-title';
 async function setInDatabase(songInfo) {
   console.log('Sending song info to firebase:', songInfo);
   const databaseURL = await FirebaseSettings.getUrl();
+  const token = await FirebaseSettings.getToken();
   if (!databaseURL) {
     console.warn('Database url not set');
     return;
   }
 
   const db = getDatabase(initializeApp({databaseURL}));
-  set(ref(db, 'songs/current'), songInfo);
+  set(ref(db, token + '/songs/current'), songInfo);
 }
 
 
