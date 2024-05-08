@@ -3,7 +3,7 @@
   "name": "Status Bar Helper",
 
   "description": "This is a helper extension for status bar.",
-  "version": "2",
+  "version": "3",
   "icons": {
     "48": "48.png",
     "64": "64.png",
