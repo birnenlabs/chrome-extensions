@@ -62,10 +62,10 @@ function setInDatabase(songInfo) {
   const verifiedDbDataPromise = (dbDataPromise || createDbData().then(verifyDbData));
 
   return verifiedDbDataPromise
-    // Database promise will be cached as dbDataPromise only if there was no error when creating db.
-    .then(() => dbDataPromise = verifiedDbDataPromise)
-    .then((dbData) => set(ref(dbData.db, dbData.token + '/songs/current'), songInfo))
-    .catch((e) => console.log(e));
+  // Database promise will be cached as dbDataPromise only if there was no error when creating db.
+      .then(() => dbDataPromise = verifiedDbDataPromise)
+      .then((dbData) => set(ref(dbData.db, dbData.token + '/songs/current'), songInfo))
+      .catch((e) => console.log(e));
 }
 
 

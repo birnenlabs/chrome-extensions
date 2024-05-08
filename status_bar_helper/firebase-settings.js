@@ -1,4 +1,5 @@
 const name = 'firebase-local-settings';
+
 /** Settings class */
 export class FirebaseSettings {
   /**

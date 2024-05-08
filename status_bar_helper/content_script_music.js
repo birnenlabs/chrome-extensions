@@ -10,10 +10,10 @@ const CHECK_REPEAT_MS = 2000;
 
 /** @type {SongInfo} */
 const EMPTY_INFO = {
-      artist: '',
-      title: '',
-      timestampMin: 0,
-    };
+  artist: '',
+  title: '',
+  timestampMin: 0,
+};
 
 /**
  * @return {SongInfo}
