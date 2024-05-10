@@ -1,3 +1,6 @@
 [submodule "window_manager/jslib"]
 	path = window_manager/jslib
 	url = https://github.com/birnenlabs/jslib
+[submodule "visual_notifications/jslib"]
+	path = visual_notifications/jslib
+	url = https://github.com/birnenlabs/jslib
