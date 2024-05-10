@@ -1,6 +1,3 @@
 [submodule "window_manager/jslib"]
 	path = window_manager/jslib
 	url = https://github.com/birnenlabs/jslib
-[submodule "status_bar_helper/jslib"]
-	path = status_bar_helper/jslib
-	url = https://github.com/birnenlabs/jslib
