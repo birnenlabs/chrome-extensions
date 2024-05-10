@@ -22,7 +22,7 @@ import {Database, getDatabase, ref, set} from 'https://www.gstatic.com/firebasej
  * @property {Database} db
  */
 
-const KEY_SONG_TITLE = 'song-title';
+const KEY_SONG_TITLE_PREFIX = 'song-title-';
 
 /**
  * @return {Promise<DbData>}
@@ -68,8 +68,47 @@ function setInDatabase(songInfo) {
       .catch((e) => console.log(e));
 }
 
+/**
+ * @param {Object} items
+ * @return {SongInfo|undefined}
+ */
+function findNewestSongTitleInStorage(items) {
+  let result = undefined;
+  for (const key of Object.getOwnPropertyNames(items)) {
+    if (key.startsWith(KEY_SONG_TITLE_PREFIX) && items[key].timestampMin > (result?.timestampMin || 0)) {
+      result = items[key];
+    }
+  }
+  return result;
+}
+
+/**
+ * @param {Object} update
+ * @return {Promise<SongInfo|undefined>}
+ */
+function findSongTitleInStorageUpdate(update) {
+  let maybeResult;
+  for (const key of Object.getOwnPropertyNames(update)) {
+    if (key.startsWith(KEY_SONG_TITLE_PREFIX)) {
+      maybeResult = update[key].newValue;
+      break;
+    }
+  }
+
+  if (maybeResult.timestampMin != 0) {
+    return Promise.resolve(maybeResult);
+  }
+
+  // Check if anything is still playing
+  return chrome.storage.session.get()
+    .then((items) => findNewestSongTitleInStorage(items) || maybeResult);
+}
 
 chrome.storage.session.setAccessLevel({accessLevel: 'TRUSTED_AND_UNTRUSTED_CONTEXTS'});
 chrome.storage.session.onChanged.addListener(
-    (changed) => changed.hasOwnProperty(KEY_SONG_TITLE) ? setInDatabase(changed[KEY_SONG_TITLE].newValue) : undefined,
+  (update) => findSongTitleInStorageUpdate(update)
+                 .then((changed) => changed ? setInDatabase(changed) : undefined)
 );
+//chrome.storage.session.onChanged.addListener(
+//    (changed) => changed.hasOwnProperty(KEY_SONG_TITLE) ? setInDatabase(changed[KEY_SONG_TITLE].newValue) : undefined,
+//);

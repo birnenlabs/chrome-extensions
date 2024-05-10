@@ -1,4 +1,4 @@
-const KEY_SONG_TITLE = 'song-title';
+const KEY_SONG_TITLE_PREFIX = 'song-title-';
 
 /**
  * @typedef {import('./background.js').SongInfo} SongInfo
@@ -40,7 +40,7 @@ function handleStateChange() {
   // Update everytime for now - assuming 24h/day music this will end up
   // with 166MB of transfer per month (out of 10GB limit).
   // When the object is not changed, the onChange event will not be fired for the storage.
-  return chrome.storage.session.set({[KEY_SONG_TITLE]: info})
+  return chrome.storage.session.set({[KEY_SONG_TITLE_PREFIX + document.location.hostname]: info})
       .then(() => setTimeout(handleStateChange, CHECK_REPEAT_MS));
 }
 
