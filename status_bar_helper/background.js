@@ -101,14 +101,14 @@ function findSongTitleInStorageUpdate(update) {
 
   // Check if anything is still playing
   return chrome.storage.session.get()
-    .then((items) => findNewestSongTitleInStorage(items) || maybeResult);
+      .then((items) => findNewestSongTitleInStorage(items) || maybeResult);
 }
 
 chrome.storage.session.setAccessLevel({accessLevel: 'TRUSTED_AND_UNTRUSTED_CONTEXTS'});
 chrome.storage.session.onChanged.addListener(
-  (update) => findSongTitleInStorageUpdate(update)
-                 .then((changed) => changed ? setInDatabase(changed) : undefined)
+    (update) => findSongTitleInStorageUpdate(update)
+        .then((changed) => changed ? setInDatabase(changed) : undefined),
 );
-//chrome.storage.session.onChanged.addListener(
+// chrome.storage.session.onChanged.addListener(
 //    (changed) => changed.hasOwnProperty(KEY_SONG_TITLE) ? setInDatabase(changed[KEY_SONG_TITLE].newValue) : undefined,
-//);
+// );
