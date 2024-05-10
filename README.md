@@ -19,7 +19,7 @@ Add your public key to https://github.com/settings/ssh.
 ```shell
 mkdir git
 cd git
-git clone https://github.com/birnenlabs/chrome-extensions
+git clone --recurse-submodules https://github.com/birnenlabs/chrome-extensions
 
 
 cd chrome-extensions
