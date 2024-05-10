@@ -1,4 +1,4 @@
-import {validateClass} from '../utils/validation.js';
+import {validateClass} from '../jslib/js/validation.js';
 
 
 /**

@@ -1,4 +1,4 @@
-import {checkNonEmpty} from '../utils/preconditions.js';
+import {checkNonEmpty} from '../jslib/js/preconditions.js';
 
 /**
  * Loads the config, and sets up editors.

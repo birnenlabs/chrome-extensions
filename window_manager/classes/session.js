@@ -1,5 +1,5 @@
 import {ActionWithDisplay} from './action.js';
-import {checkNonEmpty} from '../utils/preconditions.js';
+import {checkNonEmpty} from '../jslib/js/preconditions.js';
 
 /**
  * @typedef {Object} WindowPositionConfiguration

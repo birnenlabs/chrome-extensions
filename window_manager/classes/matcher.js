@@ -1,6 +1,6 @@
 import {ActionWithDisplay} from './action.js';
-import {checkNonEmpty} from '../utils/preconditions.js';
-import {validateClass} from '../utils/validation.js';
+import {checkNonEmpty} from '../jslib/js/preconditions.js';
+import {validateClass} from '../jslib/js/validation.js';
 
 /**
  * Will convert Matcher to MatcherWithAction based on the actions list.

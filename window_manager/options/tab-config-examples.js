@@ -1,7 +1,7 @@
 import {Action} from '../classes/action.js';
 import {Matcher} from '../classes/matcher.js';
 import {Position} from '../classes/position.js';
-import {checkNonUndefined} from '../utils/preconditions.js';
+import {checkNonUndefined} from '../jslib/js/preconditions.js';
 
 /**
  * Creates examples of action and matcher to be displayed on the page.

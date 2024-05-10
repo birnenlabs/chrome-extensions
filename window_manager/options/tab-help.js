@@ -1,4 +1,4 @@
-import {checkNonUndefined} from '../utils/preconditions.js';
+import {checkNonUndefined} from '../jslib/js/preconditions.js';
 
 /**
  * @param {string} md

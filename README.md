@@ -2,6 +2,15 @@
 
 - [JSON Window Manager](window_manager/README.md)
 
+## submodules
+
+This repo is using submodule, use the configuration:
+
+```shell
+git config --global submodule.recurse true
+```
+to automatically pull dependencies.
+
 ## Developer Documentation
 ### git + ssh
 

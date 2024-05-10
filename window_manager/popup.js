@@ -2,8 +2,8 @@ import {filterWithDisplay, matchActionsToDisplay} from './classes/action.js';
 import {Displays} from './classes/displays.js';
 import {Settings} from './classes/settings.js';
 import {Storage} from './classes/storage.js';
-import {checkNonUndefined} from './utils/preconditions.js';
-import {combine2} from './utils/promise.js';
+import {checkNonUndefined} from './jslib/js/preconditions.js';
+import {combine2} from './jslib/js/promise.js';
 
 /** @return {void} */
 function organiseClick() {

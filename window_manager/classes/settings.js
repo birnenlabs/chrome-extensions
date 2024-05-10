@@ -1,4 +1,4 @@
-import {validateClass} from '../utils/validation.js';
+import {validateClass} from '../jslib/js/validation.js';
 
 export const SETTINGS_HELP_MAP = new Map([
   ['popupButtonColor', 'Color of the button in the window that opens after left click on the extension icon. It should be the html notation (examples: white, red, #ffffff).'],

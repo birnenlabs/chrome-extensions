@@ -1,6 +1,6 @@
 import {Displays} from './classes/displays.js';
 import {Storage} from './classes/storage.js';
-import {promiseTimeout} from './utils/promise.js';
+import {promiseTimeout} from './jslib/js/promise.js';
 import {updateWindowWithAllActions, updateAllWindowsWithAllActions, updateWindowWithSpecifiedAction} from './worker.js';
 
 const ACTION_START_TIMEOUT_MS = 200;

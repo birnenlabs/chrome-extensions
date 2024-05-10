@@ -3,8 +3,8 @@ import {Display, Displays} from './classes/displays.js';
 import {filterWithAction, matchMatcherToAction, MatcherWithAction} from './classes/matcher.js';
 import {Session} from './classes/session.js';
 import {Storage} from './classes/storage.js';
-import {checkNonEmpty} from './utils/preconditions.js';
-import {combine2, combine3, promiseTimeout} from './utils/promise.js';
+import {checkNonEmpty} from './jslib/js/preconditions.js';
+import {combine2, combine3, promiseTimeout} from './jslib/js/promise.js';
 
 const UPDATE_TIMEOUT_MS = 5;
 

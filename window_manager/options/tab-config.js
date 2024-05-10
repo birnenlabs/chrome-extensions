@@ -1,7 +1,7 @@
 import {RawConfiguration, ValidatedConfiguration} from '../classes/configuration.js';
 import {Storage} from '../classes/storage.js';
-import {checkNonUndefined} from '../utils/preconditions.js';
-import {promiseTimeout} from '../utils/promise.js';
+import {checkNonUndefined} from '../jslib/js/preconditions.js';
+import {promiseTimeout} from '../jslib/js/promise.js';
 import * as StandaloneJsonEditor from '../jsoneditor/standalone.js';
 import * as schemaValidator from '../jsoneditor/schema-validator.js';
 

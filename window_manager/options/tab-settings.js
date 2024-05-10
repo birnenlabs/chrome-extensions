@@ -1,6 +1,6 @@
 import {SETTINGS_HELP_MAP, Settings} from '../classes/settings.js';
 import {Storage} from '../classes/storage.js';
-import {checkNonUndefined} from '../utils/preconditions.js';
+import {checkNonUndefined} from '../jslib/js/preconditions.js';
 
 const INPUT_CLASS = 'settingsValueInput';
 

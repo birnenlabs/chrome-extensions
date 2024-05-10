@@ -2,8 +2,8 @@ import {filterWithDisplay, matchActionsToDisplay, Action, ActionWithDisplay} fro
 import {Display, Displays} from '../classes/displays.js';
 import {matchMatcherToAction, Matcher, MatcherWithAction} from '../classes/matcher.js';
 import {Storage} from '../classes/storage.js';
-import {checkNonUndefined} from '../utils/preconditions.js';
-import {combine4} from '../utils/promise.js';
+import {checkNonUndefined} from '../jslib/js/preconditions.js';
+import {combine4} from '../jslib/js/promise.js';
 
 const SHORTCUT_WATCH_TIMEOUT = 1000;
 let definedShortcutsArray = [];

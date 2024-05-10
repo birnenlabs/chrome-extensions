@@ -1,7 +1,7 @@
 import {Display, Displays} from './displays.js';
 import {Position} from './position.js';
-import {checkNonEmpty} from '../utils/preconditions.js';
-import {validateClass} from '../utils/validation.js';
+import {checkNonEmpty} from '../jslib/js/preconditions.js';
+import {validateClass} from '../jslib/js/validation.js';
 
 
 /**

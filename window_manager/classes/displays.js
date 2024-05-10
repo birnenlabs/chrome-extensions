@@ -1,5 +1,5 @@
-import {combine2, promiseLog} from '../utils/promise.js';
-import {isServiceWorker} from '../utils/utils.js';
+import {combine2, promiseLog} from '../jslib/js/promise.js';
+import {isServiceWorker} from '../jslib/js/utils.js';
 
 /**
  * @typedef {Object} StrippedDisplay

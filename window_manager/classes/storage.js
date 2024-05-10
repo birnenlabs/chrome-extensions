@@ -2,8 +2,8 @@ import {Action} from './action.js';
 import {Configuration, RawConfiguration, ValidatedConfiguration} from './configuration.js';
 import {Matcher} from './matcher.js';
 import {Settings} from './settings.js';
-import {checkNonUndefined} from '../utils/preconditions.js';
-import {isServiceWorker} from '../utils/utils.js';
+import {checkNonUndefined} from '../jslib/js/preconditions.js';
+import {isServiceWorker} from '../jslib/js/utils.js';
 
 /** Session config key for the validated configuration */
 const VALID_CONFIG_KEY = 'validConfig';

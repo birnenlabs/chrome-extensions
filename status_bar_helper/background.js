@@ -109,6 +109,3 @@ chrome.storage.session.onChanged.addListener(
     (update) => findSongTitleInStorageUpdate(update)
         .then((changed) => changed ? setInDatabase(changed) : undefined),
 );
-// chrome.storage.session.onChanged.addListener(
-//    (changed) => changed.hasOwnProperty(KEY_SONG_TITLE) ? setInDatabase(changed[KEY_SONG_TITLE].newValue) : undefined,
-// );
