@@ -1,0 +1,3 @@
+[submodule "window_manager/jslib"]
+	path = window_manager/jslib
+	url = https://github.com/birnenlabs/jslib
