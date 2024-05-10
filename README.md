@@ -2,15 +2,6 @@
 
 - [JSON Window Manager](window_manager/README.md)
 
-## submodules
-
-This repo is using submodule, use the configuration:
-
-```shell
-git config --global submodule.recurse true
-```
-to automatically pull dependencies.
-
 ## Developer Documentation
 ### git + ssh
 
@@ -24,6 +15,7 @@ git clone --recurse-submodules https://github.com/birnenlabs/chrome-extensions
 
 cd chrome-extensions
 git remote set-url origin git+ssh://git@github.com/birnenlabs/chrome-extensions
+git config --global submodule.recurse true
 ```
 
 ### eslint
