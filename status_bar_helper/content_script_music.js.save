@@ -12,7 +12,7 @@ const CHECK_REPEAT_MS = 2000;
 const EMPTY_INFO = {
   artist: '',
   title: '',
-  timestamp: 0,
+  timestampMin: 0,
 };
 
 /**
@@ -24,7 +24,7 @@ function getInfo() {
     return {
       artist: metadata?.artist || '',
       title: metadata?.title || '',
-      timestamp: Date.now(),
+      timestampMin: Date.now() / 60000),
     };
   } else {
     return EMPTY_INFO;
