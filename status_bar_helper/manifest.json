@@ -3,7 +3,7 @@
   "name": "Status Bar Helper",
 
   "description": "This is a helper extension for status bar.",
-  "version": "5",
+  "version": "6",
   "icons": {
     "48": "48.png",
     "64": "64.png",
@@ -21,8 +21,12 @@
   },
   "content_scripts": [
     {
-      "matches": ["*://music.youtube.com/*", "*://youtube.com/*", "*://www.youtube.com/*", "*://radiotunes.com/*", "*://www.radiotunes.com/*"],
+      "matches": ["*://music.youtube.com/*", "*://youtube.com/*", "*://www.youtube.com/*"],
       "js": ["content_script_music.js"]
+    },
+    {
+      "matches": ["*://radiotunes.com/*", "*://www.radiotunes.com/*"],
+      "js": ["content_script_radiotunes.js"]
     }
   ]
 }

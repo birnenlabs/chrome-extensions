@@ -1,7 +1,7 @@
-const music = {
+const radiotunes = {
   KEY_SONG_TITLE_PREFIX: 'song-title-',
   CHECK_REPEAT_MS: 2000,
-  /** @type {MusicSongInfo} */
+  /** @type {RadiotunesSongInfo} */
   EMPTY_INFO: {
     artist: '',
     title: '',
@@ -10,16 +10,16 @@ const music = {
 };
 
 /**
- * @typedef {import('./background.js').SongInfo} MusicSongInfo
+ * @typedef {import('./background.js').SongInfo} RadiotunesSongInfo
  */
 
 console.log('Status bar helper loaded, setting media handlers');
 
 /**
- * @return {MusicSongInfo}
+ * @return {RadiotunesSongInfo}
  */
 function getInfo() {
-  if (navigator.mediaSession?.playbackState === 'playing') {
+  if (document.getElementById('webplayer-region')?.getAttribute('data-state') === 'playing') {
     const metadata = window.navigator?.mediaSession?.metadata;
     return {
       artist: metadata?.artist || '',
@@ -27,7 +27,7 @@ function getInfo() {
       timestamp: Date.now(),
     };
   } else {
-    return music.EMPTY_INFO;
+    return radiotunes.EMPTY_INFO;
   }
 }
 
@@ -40,8 +40,8 @@ function handleStateChange() {
   // Update everytime for now - assuming 24h/day music this will end up
   // with 166MB of transfer per month (out of 10GB limit).
   // When the object is not changed, the onChange event will not be fired for the storage.
-  return chrome.storage.session.set({[music.KEY_SONG_TITLE_PREFIX + document.location.hostname]: info})
-      .then(() => setTimeout(handleStateChange, music.CHECK_REPEAT_MS));
+  return chrome.storage.session.set({[radiotunes.KEY_SONG_TITLE_PREFIX + document.location.hostname]: info})
+      .then(() => setTimeout(handleStateChange, radiotunes.CHECK_REPEAT_MS));
 }
 
 handleStateChange();
