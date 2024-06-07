@@ -3,7 +3,7 @@ import {Displays} from './classes/displays.js';
 import {Settings} from './classes/settings.js';
 import {Storage} from './classes/storage.js';
 import {checkNonUndefined} from './jslib/js/preconditions.js';
-import {combine2, combine3} from './jslib/js/promise.js';
+import {combine2, combine3, promiseLogWithObject} from './jslib/js/promise.js';
 
 /** @return {void} */
 function organiseClick() {
@@ -58,15 +58,43 @@ function initShortcuts(settings) {
 
 /**
  * @param {Event} e
- * @return {void}
+ * @return {Promise<any>}
  */
 function shortcutClick(e) {
   const shortcutId = ( /** @type {HTMLElement} */ (checkNonUndefined(e).srcElement)).id;
-  Storage.getSettings()
+
+  const configuredWindowsPromise = Storage.getSettings()
       .then((settings) => settings[shortcutId])
       .then((s) => s.slice(firstAsciiIndex(s)))
-      .then((s) => s.split(',')
-          .forEach((url) => chrome.windows.create({focused: false, type: 'popup', url})));
+      .then((s) => s.split(','))
+      .then((arr) => arr.map((u) => new URL(u).href))
+      .then((arr) => promiseLogWithObject('Urls from the configuration', arr));
+
+  const openedPopupsSetPromise = chrome.windows.getAll({populate: true, windowTypes: ['popup']})
+      .then((popups) => popups.map((window) => window.tabs ? window.tabs[0].url : ''))
+      .then((urls) => new Set(urls))
+      .then((s) => promiseLogWithObject('Urls already opened', s));
+
+  return combine2(configuredWindowsPromise, openedPopupsSetPromise,
+      (configuredWindows, openedPopupsSet) =>
+        configuredWindows.filter((url) => logFilteredUrl(url, !openedPopupsSet.has(url))))
+      .then((arr) => promiseLogWithObject('Urls to open', arr))
+      .then((arr) => arr.forEach((url) => chrome.windows.create({focused: false, type: 'popup', url})));
+}
+
+/**
+ * @param {string} url
+ * @param {boolean} verdict
+ * @return {boolean}
+ */
+function logFilteredUrl(url, verdict) {
+  if (!verdict) {
+    const el = document.createElement('div');
+    checkNonUndefined(document.getElementById('error')).appendChild(el);
+    el.innerHTML = `<br>Popup window already exists for url: <i>${url}</i>`;
+    setTimeout(() => el.remove(), 1500);
+  }
+  return verdict;
 }
 
 /**
