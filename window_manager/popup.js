@@ -3,7 +3,7 @@ import {Displays} from './classes/displays.js';
 import {Settings} from './classes/settings.js';
 import {Storage} from './classes/storage.js';
 import {checkNonUndefined} from './jslib/js/preconditions.js';
-import {combine2} from './jslib/js/promise.js';
+import {combine2, combine3} from './jslib/js/promise.js';
 
 /** @return {void} */
 function organiseClick() {
@@ -38,21 +38,47 @@ function setCss(settings) {
       background-color: ${settings.popupBackgroundColor};
     }`;
   document.head.appendChild(style);
+}
 
-  console.log('setongs:' + settings.autostartApps);
-  // Hide autostart button if not defined
-  if (!settings.autostartApps) {
-    checkNonUndefined(document.getElementById('autostart')).style.display = 'none';
+/**
+ * @param {Settings} settings
+ */
+function initShortcuts(settings) {
+  // Hide shortcut buttons if not defined
+  for (let i=1; i<=4; i++) {
+    const shortcutName = 'shortcut' + i;
+    const shortcutEl = checkNonUndefined(document.getElementById(shortcutName));
+    const shortcutSettings = settings[shortcutName];
+    if (shortcutSettings) {
+      shortcutEl.textContent = shortcutSettings.slice(0, firstAsciiIndex(shortcutSettings)) || i;
+      shortcutEl.style.display = 'block';
+    }
   }
 }
 
 /**
+ * @param {Event} e
  * @return {void}
  */
-function autostartClick() {
+function shortcutClick(e) {
+  const shortcutId = ( /** @type {HTMLElement} */ (checkNonUndefined(e).srcElement)).id;
   Storage.getSettings()
-      .then((settings) => settings.autostartApps.split(',')
+      .then((settings) => settings[shortcutId])
+      .then((s) => s.slice(firstAsciiIndex(s)))
+      .then((s) => s.split(',')
           .forEach((url) => chrome.windows.create({focused: false, type: 'popup', url})));
+}
+
+/**
+ * @param {string} s
+ * @return {number}
+ */
+function firstAsciiIndex(s) {
+  let result = 0;
+  while (s.charCodeAt(result) > 255) {
+    result++;
+  }
+  return result;
 }
 
 /** @return {Promise<void>} */
@@ -67,11 +93,19 @@ function createActionsMenu() {
 
   /** @type {Promise<void>} */
   const menuGeneratedPromise = combine2(actionMenuNamesPromise, chrome.windows.getCurrent().then((window) => window.id), addActions);
-  const cssPromise = Storage.getSettings().then((s) => setCss(s));
+  const settingsPromise = Storage.getSettings();
+  const cssPromise = settingsPromise.then((s) => setCss(s));
+  // Calculate shortcuts in the background.
+  const shortcutsPromise = settingsPromise.then((s) => setTimeout(initShortcuts, 1, s));
 
-  return combine2(menuGeneratedPromise, cssPromise, () => undefined);
+  return combine3(menuGeneratedPromise, cssPromise, shortcutsPromise, () => undefined);
 }
 
 document.addEventListener('DOMContentLoaded', createActionsMenu);
 checkNonUndefined(document.getElementById('organise')).addEventListener('click', organiseClick);
-checkNonUndefined(document.getElementById('autostart')).addEventListener('click', autostartClick);
+checkNonUndefined(document.getElementById('shortcut1')).addEventListener('click', shortcutClick);
+checkNonUndefined(document.getElementById('shortcut2')).addEventListener('click', shortcutClick);
+checkNonUndefined(document.getElementById('shortcut3')).addEventListener('click', shortcutClick);
+checkNonUndefined(document.getElementById('shortcut4')).addEventListener('click', shortcutClick);
+
+
