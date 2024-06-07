@@ -6,6 +6,7 @@ export const SETTINGS_HELP_MAP = new Map([
   ['rememberPositionsSetWithShortcut', 'Actions can specify "menuName" or "shortcutId", so the window position can be set using them. When this setting is true, the window position will be remembered in this session and upon the next automatic  window positioning (after monitor changes, shortcut or button click) the window will be restored according to last used menuName or shortcutId.'],
   ['triggerOnMonitorChange', 'When this setting is true, all the windows will be automatically repositioned when monitor is attached or detached.'],
   ['triggerOnWindowCreated', 'When this setting is true, newly created windows will be positioned according to the settings.'],
+  ['autostartApps', 'Comma separated list of urls that will be opened as popup windows when clicking on the extension icon (when the list is not empty, there will be a new button in the popup menu).'],
 ]);
 
 /** Settings class */
@@ -25,9 +26,12 @@ export class Settings {
   /** @type {boolean} */
   triggerOnWindowCreated = true;
 
+  /** @type {string} */
+  autostartApps = '';
+
   /** @return {void} */
   validate() {
-    validateClass(new Settings(), this, ['popupButtonColor', 'popupBackgroundColor', 'rememberPositionsSetWithShortcut', 'triggerOnMonitorChange', 'triggerOnWindowCreated']);
+    validateClass(new Settings(), this, ['popupButtonColor', 'popupBackgroundColor', 'rememberPositionsSetWithShortcut', 'triggerOnMonitorChange', 'triggerOnWindowCreated', 'autostartApps']);
   }
 
 

@@ -38,6 +38,21 @@ function setCss(settings) {
       background-color: ${settings.popupBackgroundColor};
     }`;
   document.head.appendChild(style);
+
+  console.log('setongs:' + settings.autostartApps);
+  // Hide autostart button if not defined
+  if (!settings.autostartApps) {
+    checkNonUndefined(document.getElementById('autostart')).style.display = 'none';
+  }
+}
+
+/**
+ * @return {void}
+ */
+function autostartClick() {
+  Storage.getSettings()
+      .then((settings) => settings.autostartApps.split(',')
+          .forEach((url) => chrome.windows.create({focused: false, type: 'popup', url})));
 }
 
 /** @return {Promise<void>} */
@@ -59,3 +74,4 @@ function createActionsMenu() {
 
 document.addEventListener('DOMContentLoaded', createActionsMenu);
 checkNonUndefined(document.getElementById('organise')).addEventListener('click', organiseClick);
+checkNonUndefined(document.getElementById('autostart')).addEventListener('click', autostartClick);
