@@ -3,6 +3,15 @@ import {initializeApp} from 'https://www.gstatic.com/firebasejs/10.11.1/firebase
 import {Database, getDatabase, ref, set} from 'https://www.gstatic.com/firebasejs/10.11.1/firebase-database.js';
 import {combine2} from './jslib/js/promise.js';
 
+/**
+ * SHORT DESCRIPTION
+ *
+ * content_script_*.js files will save the now playing song in the session database together with a timestamp.
+ * Timestamp is used to make sure that `chrome.storage.session.onChanged` is called (this function is only
+ * called when there is a difference between old and new data).
+ *
+ * background script will
+ */
 
 /**
  * @typedef {Object} SongInfo
@@ -60,16 +69,65 @@ function verifyDbData(dbData) {
 /** @type{Promise<VerifiedDbData>|undefined} */
 let dbDataPromise = undefined;
 
+let clearSongTimeout = undefined;
+
 /**
- * @param {SongInfo|undefined} songInfo
+ * This method has to be invoked every 2 seconds (i.e. on content script song update) otherwise the
+ * timer will clear the song title.
+ */
+function refreshSongTimeout() {
+  clearTimeout(clearSongTimeout);
+  clearSongTimeout = setTimeout(
+      () => chrome.storage.session.set({[KEY_SONG_TITLE]: EMPTY_INFO}).then(() => console.log('Cleared song after the timeout')),
+      2500);
+}
+
+/**
+ * Will update the session storage if a new song is sent by a content script.
+ *
+ *
+ * @param {Object} update
  * @return {Promise<any>}
  */
-function maybeSetInDatabase(songInfo) {
-  if (songInfo === undefined) {
+function processContentScriptUpdate(update) {
+  /** @type {SongInfo[]} */
+  const contentScriptUpdates =
+    Object.getOwnPropertyNames(update)
+        .filter((key) => key.startsWith(KEY_SONG_TITLE_PREFIX))
+        .map((key) => update[key].newValue);
+
+  if (contentScriptUpdates.length === 0) {
     return Promise.resolve();
   }
 
-  console.log('Sending song info to firebase:', songInfo);
+  // The update should contain a single value as each content_script works independently.
+  if (contentScriptUpdates.length !== 1) {
+    throw new Error('Unexpected update length', update);
+  }
+
+  refreshSongTimeout();
+
+  /** @type {SongInfo} */
+  const songInfo = contentScriptUpdates[0];
+  // Clear timestamp so the chrome.storage.session.onChanged method is not invoked
+  // when no change to the song title was done
+  songInfo.timestamp = 0;
+  return chrome.storage.session.set({[KEY_SONG_TITLE]: songInfo});
+}
+
+/**
+ * Will update firebase if a new song is added in `KEY_SONG_TITLE`.
+ *
+ * @param {Object} update
+ * @return {Promise<any>}
+ */
+function processSongUpdate(update) {
+  if (!update.hasOwnProperty(KEY_SONG_TITLE)) {
+    return Promise.resolve();
+  }
+
+  const songInfo = update[KEY_SONG_TITLE].newValue;
+  console.log('Sending song info to firebase', songInfo);
 
   const verifiedDbDataPromise = (dbDataPromise || createDbData().then(verifyDbData));
 
@@ -80,64 +138,7 @@ function maybeSetInDatabase(songInfo) {
       .catch((e) => console.log(e));
 }
 
-let clearSongTimeout = undefined;
-
-/**
- * @param {SongInfo|undefined} songInfo
- * @return {Promise<any>}
- */
-function maybeUpdateSession(songInfo) {
-  if (songInfo === undefined) {
-    return Promise.resolve();
-  }
-
-  clearTimeout(clearSongTimeout);
-  if (songInfo.title) {
-    // Set timer to clear the title in 2.5 seconds if it's not refreshed
-    clearSongTimeout = setTimeout(
-        () => maybeUpdateSession(EMPTY_INFO).then(() => console.log('Cleared song after the timeout')),
-        2500);
-  }
-
-  // Clear timestamp so the onUpdate method is not invoked when no change to the song title was done
-  songInfo.timestamp = 0;
-  return chrome.storage.session.set({[KEY_SONG_TITLE]: songInfo});
-}
-
-/**
- * This function will be invoked for both:
- * - contentScript song update
- * - background script current song update
- *
- * chrome.storage.onChanged is invoked only when data was really updated. When using
- * storage before updating the database it will filter out no op updates when whe should
- * not update data in the realtime database (last updated value will be stored localy
- * like in the cache).
- *
- * @param {Object} update
- * @return {Promise<any>}
- */
-function processStorageUpdate(update) {
-  /** @type {SongInfo[]} */
-  const contentScriptUpdates =
-    Object.getOwnPropertyNames(update)
-        .filter((key) => key.startsWith(KEY_SONG_TITLE_PREFIX))
-        .map((key) => update[key].newValue);
-
-  /** @type {SongInfo|undefined} */
-  const contentScriptUpdate =
-    contentScriptUpdates.length === 0 ? undefined :
-    contentScriptUpdates
-        .reduce((value, maxValue) => value.timestamp > maxValue.timestamp ? value : maxValue);
-
-  /** @type {SongInfo|undefined} */
-  const databaseUpdate = update.hasOwnProperty(KEY_SONG_TITLE) ?
-     update[KEY_SONG_TITLE].newValue :
-     undefined;
-
-  return maybeSetInDatabase(databaseUpdate)
-      .then(() => maybeUpdateSession(contentScriptUpdate));
-}
 
 chrome.storage.session.setAccessLevel({accessLevel: 'TRUSTED_AND_UNTRUSTED_CONTEXTS'});
-chrome.storage.session.onChanged.addListener((update) => processStorageUpdate(update));
+chrome.storage.session.onChanged.addListener((update) => processContentScriptUpdate(update));
+chrome.storage.session.onChanged.addListener((update) => processSongUpdate(update));
