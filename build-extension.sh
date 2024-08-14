@@ -23,6 +23,7 @@ set -e # exit on error
 mkdir -p "${package_dir}/target"
 cd "${package_dir}/$1"
 npm install
+npm audit
 npm run eslint
 npm run typecheck
 npm run generate-files
