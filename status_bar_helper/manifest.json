@@ -3,7 +3,7 @@
   "name": "Status Bar Helper",
 
   "description": "This is a helper extension for status bar.",
-  "version": "8",
+  "version": "9",
   "icons": {
     "48": "48.png",
     "64": "64.png",
@@ -27,6 +27,10 @@
     {
       "matches": ["*://di.fm/*", "*://www.di.fm/*", "*://radiotunes.com/*", "*://www.radiotunes.com/*"],
       "js": ["content_script_radiotunes.js"]
+    },
+    {
+      "matches": ["*://tunein.com/*", "*://www.tunein.com/*"],
+      "js": ["content_script_tunein.js"]
     }
   ]
 }
