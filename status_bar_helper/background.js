@@ -17,7 +17,7 @@ import {combine2} from './jslib/js/promise.js';
  * @typedef {Object} SongInfo
  * @property {string} artist
  * @property {string} title
- * @property {number} timestamp
+ * @property {number} [timestamp]
  */
 
 /**
@@ -39,7 +39,6 @@ const KEY_SONG_TITLE = 'song-title';
 const EMPTY_INFO = {
   artist: '',
   title: '',
-  timestamp: 0,
 };
 
 /**
@@ -110,8 +109,10 @@ function processContentScriptUpdate(update) {
   /** @type {SongInfo} */
   const songInfo = contentScriptUpdates[0];
   // Clear timestamp so the chrome.storage.session.onChanged method is not invoked
-  // when no change to the song title was done
-  songInfo.timestamp = 0;
+  // when no change to the song title was done. This timestamp is only used for internal
+  // communication between pages and background script. The actual timestamp stored in firebase
+  // is set when sending data.
+  delete songInfo.timestamp;
   return chrome.storage.session.set({[KEY_SONG_TITLE]: songInfo});
 }
 
@@ -126,7 +127,11 @@ function processSongUpdate(update) {
     return Promise.resolve();
   }
 
-  const songInfo = update[KEY_SONG_TITLE].newValue;
+  const songInfo = {
+    artist: update[KEY_SONG_TITLE].newValue.artist,
+    title: update[KEY_SONG_TITLE].newValue.title,
+    timestamp_sec: Math.floor(Date.now() / 1000),
+  }
   console.log('Sending song info to firebase', songInfo);
 
   const verifiedDbDataPromise = (dbDataPromise || createDbData().then(verifyDbData));
